@@ -1,0 +1,47 @@
+/* tutoriais.css — pagina de tutoriais. Gerado por tools/tutoriais/make_site.js: edite la, nao aqui. */
+.tut-page h1 { font-size: clamp(2rem, 4.2vw, 2.8rem); margin-bottom: 14px; }
+.tut-page .lead { margin-bottom: 40px; }
+.tuts { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; align-items: start; }
+.tut-list { position: sticky; top: 84px; display: grid; gap: 6px; }
+.tut-item {
+  position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--muted); transition: border-color .2s ease, background-color .2s ease;
+}
+.tut-item:hover { border-color: var(--line-2); color: var(--text); }
+.tut-item:has(input:checked) { background: var(--accent-soft); border-color: rgba(46, 155, 255, .45); color: var(--text); }
+.tut-item:has(input:checked) .tut-n { background: var(--accent-strong); color: #fff; }
+.tut-item:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tut-n {
+  flex: none; width: 26px; height: 26px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center;
+  font: 700 .8rem var(--font); color: var(--muted); background: var(--raised);
+}
+.tut-txt { display: grid; gap: 2px; min-width: 0; }
+.tut-txt b { color: inherit; font-weight: 650; line-height: 1.3; }
+.tut-txt small { color: var(--faint); font-size: .84rem; line-height: 1.4; }
+.tut-panel { display: none; min-width: 0; }
+.tut-video { margin: 0 0 24px; }
+.tut-video video { width: 100%; aspect-ratio: 16 / 9; background: #000; }
+.tut-panel h2 { margin-bottom: 10px; }
+.tut-desc { color: var(--muted); max-width: 68ch; margin-bottom: 26px; }
+.tut-steps-title { font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.tut-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: passo; max-width: 72ch; }
+.tut-steps li { counter-increment: passo; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+.tut-steps li::before {
+  content: counter(passo); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  font: 700 .82rem var(--font); color: #fff; background: var(--accent-strong);
+}
+.tut-steps b { color: #cfe2ff; }
+.tuts:has(#t-gravar:checked) #p-gravar { display: block; }
+.tuts:has(#t-reproduzir:checked) #p-reproduzir { display: block; }
+.tuts:has(#t-editar:checked) #p-editar { display: block; }
+.tuts:has(#t-ver-cliques:checked) #p-ver-cliques { display: block; }
+.tuts:has(#t-mudar-cliques:checked) #p-mudar-cliques { display: block; }
+.tuts:has(#t-memorias:checked) #p-memorias { display: block; }
+.tuts:has(#t-constantes:checked) #p-constantes { display: block; }
+.tuts:has(#t-listas:checked) #p-listas { display: block; }
+.tuts:has(#t-funcoes:checked) #p-funcoes { display: block; }
+@media (max-width: 960px) {
+  .tuts { grid-template-columns: 1fr; }
+  .tut-list { position: static; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); overflow-x: auto; padding-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .tut-item { transition: none; } }

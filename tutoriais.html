@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Gerado por tools/tutoriais/make_site.js a partir de vestro_macro/web/tutoriais.js: edite la, nao aqui.
+       Mesma politica do index.html: nenhum script, nenhum recurso de fora. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Tutoriais · Vestro Macro</title>
+  <meta name="description" content="Vídeos curtos de como usar o Vestro Macro: gravar, reproduzir, editar, ver e mudar cliques, memórias, constantes, listas e funções.">
+  <meta name="theme-color" content="#070a10">
+  <link rel="icon" href="img/icone.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="tutoriais.css">
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="index.html" aria-label="Vestro Macro, início">
+        <img src="img/logo.png" alt="" width="34" height="34"><span>Vestro Macro</span>
+      </a>
+      <nav aria-label="Seções">
+        <a href="index.html#recursos">Recursos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="tutoriais.html" aria-current="page">Tutoriais</a>
+        <a href="index.html#licencas">Licenças</a>
+        <a href="index.html#duvidas">Dúvidas</a>
+        <a href="index.html#contato">Contato</a>
+      </nav>
+      <a class="btn btn-small btn-primary" href="index.html#baixar">Baixar</a>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="section tut-page">
+      <div class="wrap">
+        <p class="eyebrow">Tutoriais</p>
+        <h1>Aprenda a usar o Vestro</h1>
+        <p class="lead">Vídeos curtos mostrando o Vestro numa planilha e num sistema de exemplo: do primeiro clique em Gravar até copiar dados de um programa para outro. Os mesmos vídeos ficam no botão <b>Tutorial</b>, no topo do app.</p>
+
+        <div class="tuts">
+          <nav class="tut-list" aria-label="Tópicos dos tutoriais">
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-gravar" checked aria-labelledby="n-gravar"><span class="tut-n">1</span><span class="tut-txt"><b id="n-gravar">Gravar uma tarefa</b><small>Faça a tarefa uma vez e o Vestro anota cada tecla e cada clique.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-reproduzir" aria-labelledby="n-reproduzir"><span class="tut-n">2</span><span class="tut-txt"><b id="n-reproduzir">Reproduzir</b><small>Mande o Vestro repetir a tarefa quantas vezes precisar.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-editar" aria-labelledby="n-editar"><span class="tut-n">3</span><span class="tut-txt"><b id="n-editar">Editar o workflow</b><small>Troque teclas por um texto, mude tempos e crie um loop sem programar.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-ver-cliques" aria-labelledby="n-ver-cliques"><span class="tut-n">4</span><span class="tut-txt"><b id="n-ver-cliques">Ver onde o mouse clica</b><small>Mostre na tela o ponto exato de cada clique gravado.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-mudar-cliques" aria-labelledby="n-mudar-cliques"><span class="tut-n">5</span><span class="tut-txt"><b id="n-mudar-cliques">Mudar um clique de lugar</b><small>O botão mudou de lugar? Clique no ponto novo e pronto.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-memorias" aria-labelledby="n-memorias"><span class="tut-n">6</span><span class="tut-txt"><b id="n-memorias">Memórias: copiar e colar entre programas</b><small>Copie nome e CPF do sistema e cole os dois na planilha, cliente por cliente.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-constantes" aria-labelledby="n-constantes"><span class="tut-n">7</span><span class="tut-txt"><b id="n-constantes">Constantes: o texto que se repete</b><small>Guarde um texto fixo, como um nome ou um e-mail, e use em vários lugares.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-listas" aria-labelledby="n-listas"><span class="tut-n">8</span><span class="tut-txt"><b id="n-listas">Listas: um valor diferente a cada volta</b><small>Digite um item diferente de uma lista em cada volta do loop.</small></span></label>
+          <label class="tut-item"><input class="sr-only" type="radio" name="tutorial" id="t-funcoes" aria-labelledby="n-funcoes"><span class="tut-n">9</span><span class="tut-txt"><b id="n-funcoes">Funções: montar o texto na hora</b><small>Junte texto, contadores, listas e datas numa fórmula, como no Excel.</small></span></label>
+          </nav>
+          <div class="tut-panels">
+          <article class="tut-panel" id="p-gravar" aria-labelledby="h-gravar">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/gravar.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/gravar.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-gravar">Gravar uma tarefa</h2>
+            <p class="tut-desc">Para gravar, faça a tarefa do jeito de sempre. Aqui, um pedido da planilha é marcado como pago: um clique na célula, a palavra “pago” e Enter. Cada clique e cada tecla vira uma caixinha do workflow, e cada seta guarda o tempo entre elas.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Abra um workflow e clique em <b>Gravar</b> (ou aperte <b>F9</b>).</span></li>
+              <li><span>O Vestro se esconde e mostra o selo <b>Gravando</b> no topo da tela.</span></li>
+              <li><span>Faça a tarefa normalmente: aqui, clicar na célula e digitar <b>pago</b>.</span></li>
+              <li><span>Aperte <b>F9</b> de novo para parar.</span></li>
+              <li><span>Pronto: cada clique e cada tecla virou uma caixinha, e as setas guardam o tempo entre elas.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-reproduzir" aria-labelledby="h-reproduzir">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/reproduzir.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/reproduzir.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-reproduzir">Reproduzir</h2>
+            <p class="tut-desc">O workflow “Marcar pago” digita “pago” e aperta Enter. Com a primeira célula selecionada e 3 repetições, o Vestro marca três pedidos seguidos. Por padrão, ele sai da frente enquanto reproduz, para as teclas irem para o programa certo.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Deixe o programa pronto: aqui, a primeira célula que vai receber o texto.</span></li>
+              <li><span>Em <b>Repetir</b>, escolha quantas vezes. A <b>Velocidade</b> deixa mais rápido ou mais devagar.</span></li>
+              <li><span>Clique em <b>Reproduzir</b> (ou aperte <b>F8</b>). O Vestro sai da frente enquanto a macro roda e volta no fim.</span></li>
+              <li><span>Quer ver a caixinha que está rodando? Nas opções de reprodução, desligue <b>Minimizar</b> e use o <b>F8</b> com o programa em foco.</span></li>
+              <li><span>Para parar no meio, aperte <b>Esc</b>. O <b>∞</b> repete até você parar.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-editar" aria-labelledby="h-editar">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/editar.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/editar.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-editar">Editar o workflow</h2>
+            <p class="tut-desc">Depois de gravar, tudo se ajusta no próprio fluxo. Aqui, as letras de “pago” viram uma ação Texto só, a espera ganha um tempo próprio e o trecho que marca o pedido vira um loop de 3 voltas.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Clique numa caixinha para ver e mudar os detalhes na gaveta de baixo.</span></li>
+              <li><span>Selecione várias com <b>Shift</b> + clique e apague com <b>Delete</b>.</span></li>
+              <li><span>Arraste uma ação do painel (aqui, <b>Texto</b>) até o lugar certo e escreva o texto.</span></li>
+              <li><span>Clique numa seta para mudar o tempo de espera antes da próxima ação.</span></li>
+              <li><span>Selecione um trecho e aperte <b>Ctrl+G</b> para virar um loop. Escolha o número de voltas.</span></li>
+              <li><span>Reproduza para conferir. Errou? <b>Ctrl+Z</b> desfaz.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-ver-cliques" aria-labelledby="h-ver-cliques">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/ver-cliques.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/ver-cliques.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-ver-cliques">Ver onde o mouse clica</h2>
+            <p class="tut-desc">Cada caixinha amarela é um clique do mouse, com a posição na tela. O olhinho mostra esse ponto com uma mira por cima de tudo. Com várias caixinhas selecionadas, o Vestro mostra todos os cliques numerados, na ordem.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Passe o mouse numa caixinha de mouse e clique no <b>olhinho</b>.</span></li>
+              <li><span>Uma mira aparece no ponto exato da tela onde a macro vai clicar.</span></li>
+              <li><span>Selecione várias (<b>Ctrl+A</b> seleciona todas) e aperte <b>E</b>.</span></li>
+              <li><span>Os cliques aparecem numerados, na ordem em que acontecem.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-mudar-cliques" aria-labelledby="h-mudar-cliques">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/mudar-cliques.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/mudar-cliques.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-mudar-cliques">Mudar um clique de lugar</h2>
+            <p class="tut-desc">O sistema foi atualizado e o botão Exportar mudou de lugar: a macro passou a clicar no vazio. Na gaveta do clique, “Clicar na tela” esconde o Vestro e espera você clicar no lugar novo. Ali também dá para trocar o botão do mouse e o tipo de clique.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Reproduza: o botão mudou de lugar e o clique cai no vazio.</span></li>
+              <li><span>Clique na caixinha do mouse e, na gaveta, em <b>Clicar na tela</b>.</span></li>
+              <li><span>O Vestro se esconde: clique no lugar novo do botão.</span></li>
+              <li><span>A posição muda na hora. Na gaveta também dá para trocar o botão do mouse e o tipo de clique.</span></li>
+              <li><span>Reproduza de novo: agora o clique acerta o botão.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-memorias" aria-labelledby="h-memorias">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/memorias.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/memorias.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-memorias">Memórias: copiar e colar entre programas</h2>
+            <p class="tut-desc">O Ctrl+C gravado vira uma ação Copiar, que pode guardar o texto numa memória (M1 a M5). A ação Colar usa a memória que você escolher, mesmo com outras cópias no meio. Num loop, o Vestro passa o nome e o CPF dos três clientes do sistema para a planilha.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>O Ctrl+C gravado vira a ação <b>Copiar</b>. Na gaveta, em <b>Guardar o texto copiado em</b>, escolha a <b>Memória 1</b> para o nome.</span></li>
+              <li><span>Faça o mesmo com o CPF, na <b>Memória 2</b>.</span></li>
+              <li><span>Na aba <b>Variáveis</b>, dê nomes às memórias: <b>Cliente</b> e <b>CPF</b>.</span></li>
+              <li><span>Em cada <b>Colar</b>, escolha em <b>Colar o quê</b> a memória certa.</span></li>
+              <li><span>Reproduza: a cada volta, o Vestro copia os dois campos e cola os dois na planilha.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-constantes" aria-labelledby="h-constantes">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/constantes.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/constantes.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-constantes">Constantes: o texto que se repete</h2>
+            <p class="tut-desc">Constantes são textos que não mudam: um e-mail, o nome da empresa, um código de setor. Você escreve uma vez na aba Variáveis e usa em qualquer Colar. Mudou o texto? Troca num lugar só.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Na aba <b>Variáveis</b>, escreva a constante: um nome e o texto.</span></li>
+              <li><span>Numa ação <b>Colar</b>, escolha em <b>Colar o quê</b> a constante.</span></li>
+              <li><span>Escolha <b>Colar (Ctrl+V)</b> ou <b>Digitar letra por letra</b>.</span></li>
+              <li><span>Reproduza: o texto da constante entra em cada linha.</span></li>
+              <li><span>Mudou o texto? Troque na aba Variáveis: todas as ações que usam a constante mudam junto.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-listas" aria-labelledby="h-listas">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/listas.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/listas.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-listas">Listas: um valor diferente a cada volta</h2>
+            <p class="tut-desc">Uma lista guarda vários valores, um por linha. A ação Lista digita o valor da vez e, a cada volta do loop, passa para o próximo. Aqui, a lista de clientes preenche a coluna da planilha.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Na aba <b>Variáveis</b>, clique em <b>Nova lista</b> e escreva um valor por linha.</span></li>
+              <li><span>Em <b>Avança a cada volta de</b>, escolha o loop: cada volta usa o próximo valor.</span></li>
+              <li><span>Arraste a ação <b>Lista</b> para dentro do loop.</span></li>
+              <li><span>Reproduza: cada volta digita um cliente da lista.</span></li>
+            </ol>
+          </article>
+          <article class="tut-panel" id="p-funcoes" aria-labelledby="h-funcoes">
+            <figure class="shot tut-video">
+              <video controls preload="none" playsinline poster="img/tutoriais/funcoes.jpg" width="1920" height="1080">
+                <source src="media/tutoriais/funcoes.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <h2 id="h-funcoes">Funções: montar o texto na hora</h2>
+            <p class="tut-desc">Uma função monta o texto na hora de colar. Aqui, ela cria o número do pedido com o número da volta do loop: PED-001, PED-002, PED-003. O resultado aparece enquanto você escreve a fórmula.</p>
+            <h3 class="tut-steps-title">Passo a passo</h3>
+            <ol class="tut-steps">
+              <li><span>Na aba <b>Funções</b>, clique em <b>Nova</b> e dê um nome.</span></li>
+              <li><span>Monte a fórmula com os botões: texto entre aspas, <b>&amp;</b> junta as partes e <b>VOLTA</b> é o número da volta.</span></li>
+              <li><span>O resultado aparece na hora. Salve.</span></li>
+              <li><span>Na ação <b>Colar</b>, escolha a função em <b>Colar o quê</b>.</span></li>
+              <li><span>Reproduza: a cada volta a função calcula de novo.</span></li>
+            </ol>
+          </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span class="brand small"><img src="img/logo.png" alt="" width="24" height="24"><span>Vestro Macro</span></span>
+      <span>© 2026 Vestro Macro · Feito para Windows 10 e 11</span>
+      <span class="foot-links"><a href="privacidade.html">Privacidade</a><a href="#conteudo">Voltar ao topo ↑</a></span>
+    </div>
+  </footer>
+</body>
+</html>
