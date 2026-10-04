@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Mesma politica do index.html: nenhum script, nenhum recurso de fora. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Privacidade · Vestro Macro</title>
+  <meta name="description" content="Quais dados o Vestro Macro usa, para quê e por quanto tempo.">
+  <meta name="theme-color" content="#070a10">
+  <link rel="icon" href="img/icone.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="index.html" aria-label="Vestro Macro, início">
+        <img src="img/logo.png" alt="" width="34" height="34"><span>Vestro Macro</span>
+      </a>
+      <nav aria-label="Seções">
+        <a href="index.html#recursos">Recursos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="index.html#licencas">Licenças</a>
+        <a href="index.html#duvidas">Dúvidas</a>
+        <a href="index.html#contato">Contato</a>
+      </nav>
+      <a class="btn btn-small btn-primary" href="index.html#baixar">Baixar</a>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <!-- textos conferidos com o codigo: vestro_macro/licensing.py e server/license_server/app.py -->
+    <article class="section">
+      <div class="wrap narrow prose">
+        <h1>Privacidade</h1>
+        <p class="lead">Quais dados o Vestro Macro usa, para quê e por quanto tempo. Vale para o aplicativo e para este site.</p>
+
+        <h2>O que fica só no seu computador</h2>
+        <p>Tudo o que você grava e monta no Vestro: os workflows, as listas, as constantes e o que a macro copia e cola. Esses arquivos ficam guardados com a criptografia do próprio Windows e não são enviados para lugar nenhum.</p>
+
+        <h2>O que o aplicativo envia</h2>
+        <p>Para ativar a licença e conferir de tempos em tempos se ela continua válida, o Vestro envia ao servidor da licença:</p>
+        <ul>
+          <li>a chave de licença;</li>
+          <li>uma impressão do computador: um código calculado a partir do ID do Windows e do modelo da placa-mãe, que não permite recuperar esses dados;</li>
+          <li>o nome do computador e o nome do usuário do Windows;</li>
+          <li>a versão do aplicativo.</li>
+        </ul>
+        <p>O servidor também registra o endereço IP de onde veio a conferência.</p>
+        <p>Esses dados servem para conferir a licença, prender a licença fixa a um computador, controlar as vagas da flutuante, aprovar a troca de computador e barrar tentativas de abuso.</p>
+
+        <h2>Quando você compra</h2>
+        <p>O nome e o contato que você passa pelo WhatsApp ficam guardados junto da licença, para identificar a licença e dar suporte.</p>
+
+        <h2>Por quanto tempo</h2>
+        <ul>
+          <li>O histórico de conferências da licença é apagado sozinho depois de 180 dias.</li>
+          <li>Os dados da licença (nome, contato e o último computador que usou) ficam enquanto a licença existir. Quando a licença é excluída, eles são apagados. Fica só o registro de que ela foi excluída, com o nome do cliente e o final da chave, por até 400 dias.</li>
+        </ul>
+
+        <h2>Com quem os dados são compartilhados</h2>
+        <p>Com ninguém. Os dados não são vendidos nem repassados, e ficam num servidor próprio do Vestro Macro.</p>
+        <p>Este site não usa cookies, analytics nem rastreamento. Ele é hospedado no GitHub Pages, e o GitHub pode registrar o endereço IP de quem acessa, por segurança, conforme a <a href="https://docs.github.com/pt/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener noreferrer" target="_blank">declaração de privacidade do GitHub</a>. A conversa pelo WhatsApp segue a política do próprio WhatsApp.</p>
+
+        <h2>Por que esses dados podem ser usados</h2>
+        <p>Para conferir a licença, a base é a execução do contrato da licença (Lei Geral de Proteção de Dados, art. 7º, V). Para os limites contra abuso, é o interesse legítimo de proteger o serviço (art. 7º, IX).</p>
+
+        <h2>Seus direitos</h2>
+        <p>Você pode pedir para saber quais dados existem sobre você, corrigir ou apagar. Apagar os dados encerra a licença, porque o Vestro precisa da conferência para funcionar.</p>
+        <p>Para qualquer pedido ou dúvida, <a href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Tenho%20uma%20pergunta%20sobre%20a%20privacidade%20no%20Vestro%20Macro." rel="noopener noreferrer" target="_blank">entre em contato com o suporte via WhatsApp</a>, no (47) 98876-9948.</p>
+
+        <p class="fine">Atualizado em outubro de 2026.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span class="brand small"><img src="img/logo.png" alt="" width="24" height="24"><span>Vestro Macro</span></span>
+      <span>© 2026 Vestro Macro · Feito para Windows 10 e 11</span>
+      <span class="foot-links"><a href="privacidade.html" aria-current="page">Privacidade</a><a href="index.html">Voltar ao site</a></span>
+    </div>
+  </footer>
+</body>
+</html>

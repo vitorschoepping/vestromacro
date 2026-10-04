@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Site estatico: nenhum script, nenhum recurso de fora (sem fontes, analytics ou cookies). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Vestro Macro · grave uma vez, o Vestro repete por você</title>
+  <meta name="description" content="Grave o que você faz no teclado e no mouse e repita com um clique. Fluxo visual, esperas por janela e imagem, loops, listas, copiar e colar com memórias. Para Windows 10 e 11.">
+  <meta name="theme-color" content="#070a10">
+  <link rel="icon" href="img/icone.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- ===================================================== topo -->
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="#topo" aria-label="Vestro Macro, início">
+        <img src="img/logo.png" alt="" width="34" height="34"><span>Vestro Macro</span>
+      </a>
+      <nav aria-label="Seções">
+        <a href="#recursos">Recursos</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#licencas">Licenças</a>
+        <a href="#duvidas">Dúvidas</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <a class="btn btn-small btn-primary" href="#baixar">Baixar</a>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <!-- ===================================================== abertura -->
+    <section class="hero" id="topo">
+      <div class="wrap hero-in">
+        <div class="hero-text">
+          <h1>Chega de repetir<br>a mesma tarefa.<br><span class="glow">Grave uma vez e o Vestro faz por você.</span></h1>
+          <p class="lead">Preencher o mesmo cadastro pela centésima vez. Passar dados de um sistema para outro na mão. Clicar nos mesmos botões até o fim do expediente. É tempo que some do seu dia, e é aí que aparecem os erros de digitação. Faça a tarefa uma vez: o Vestro grava e repete quantas vezes você precisar, esperando cada tela carregar.</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="#baixar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>
+              Baixar para Windows
+            </a>
+            <a class="btn btn-ghost" href="#licencas">Comprar licença</a>
+          </div>
+          <p class="fine">Para Windows 10 e 11 · versão 2.0 · para usar, você precisa de uma chave de licença</p>
+        </div>
+
+        <!-- um pedacinho de workflow, igual ao editor do app -->
+        <div class="flow-demo" aria-hidden="true">
+          <div class="flow-row">
+            <span class="start">▶</span>
+            <span class="edge"><b>400</b><i>ms</i></span>
+            <span class="node key n1">Ctrl<small>▼</small></span>
+            <span class="edge"><b>120</b><i>ms</i></span>
+            <span class="node key n2">C</span>
+            <span class="edge"><b>90</b><i>ms</i></span>
+            <span class="node clip n3">⧉<small>M1 CPF</small></span>
+          </div>
+          <div class="flow-loop">
+            <span class="loop-tag">⟳ Repetir 3×</span>
+            <div class="flow-row">
+              <span class="edge wait"><b>⌛ Cadastro</b><i>+500 ms</i></span>
+              <span class="node mouse n4">🖱<small>412, 318</small></span>
+              <span class="edge"><b>150</b><i>ms</i></span>
+              <span class="node list n5">{x}<small>nomes</small></span>
+              <span class="edge"><b>150</b><i>ms</i></span>
+              <span class="node key n6">Enter</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <figure class="shot shot-hero">
+          <img src="img/editor.png" alt="Editor do Vestro Macro: workflows salvos à esquerda, o fluxo de caixinhas e setas no centro e os comandos Gravar e Reproduzir à direita" width="1360" height="840">
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================================================== recursos -->
+    <section class="section" id="recursos">
+      <div class="wrap">
+        <p class="eyebrow">Recursos</p>
+        <h2>Tudo o que uma tarefa repetitiva precisa</h2>
+        <div class="cards">
+          <article class="card">
+            <h3><span class="ico c-key" aria-hidden="true">▢</span>Fluxo visual</h3>
+            <p>Cada tecla e cada clique vira uma caixinha, e cada seta é a espera até a próxima ação. Arraste, duplique, agrupe e desfaça.</p>
+          </article>
+          <article class="card">
+            <h3><span class="ico c-wait" aria-hidden="true">⌛</span>Espera inteligente</h3>
+            <p>Troque “esperar 3 segundos” por “esperar a janela aparecer”, “o programa terminar de carregar” ou “uma imagem aparecer na tela”.</p>
+          </article>
+          <article class="card">
+            <h3><span class="ico c-loop" aria-hidden="true">⟳</span>Loops e listas</h3>
+            <p>Repita trechos quantas vezes quiser, com loops dentro de loops, e digite um valor diferente de uma lista a cada volta.</p>
+          </article>
+          <article class="card">
+            <h3><span class="ico c-clip" aria-hidden="true">⧉</span>Copiar e colar com memórias</h3>
+            <p>O Ctrl+C guarda o texto numa memória, como “CPF”, e o Colar usa esse valor em outro programa, sem ficar alternando janelas.</p>
+          </article>
+          <article class="card">
+            <h3><span class="ico c-fn" aria-hidden="true">ƒ</span>Funções no jeito do Excel</h3>
+            <p><code>MAIUSCULA</code>, <code>PREENCHER</code>, <code>SO_NUMEROS</code>, <code>HOJE</code>… monte o texto que vai ser colado, como numa planilha.</p>
+          </article>
+          <article class="card">
+            <h3><span class="ico c-mouse" aria-hidden="true">◎</span>Seus cliques, no lugar certo</h3>
+            <p>Grave os cliques do mouse como você já faz: esquerdo, direito e rolagem. O Vestro guarda o ponto exato da tela e repete ali. Mudou um botão de lugar? Clique no ponto novo e pronto.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== como funciona -->
+    <section class="section alt" id="como-funciona">
+      <div class="wrap">
+        <p class="eyebrow">Como funciona</p>
+        <h2>Três passos</h2>
+        <ol class="steps">
+          <li><span class="num">1</span><h3>Grave</h3><p>Faça a tarefa uma vez, do jeito que você já faz. O Vestro anota cada tecla e cada clique.</p></li>
+          <li><span class="num">2</span><h3>Ajuste</h3><p>Troque tempos fixos por esperas, crie loops e use listas e funções. Tudo salva sozinho.</p></li>
+          <li><span class="num">3</span><h3>Reproduza</h3><p>Mande reproduzir e deixe o Vestro repetir quantas vezes você precisar.</p></li>
+        </ol>
+
+        <div class="showcase">
+          <figure class="shot">
+            <img src="img/eventos.png" alt="Gaveta de uma seta mostrando os eventos gravados: a janela Salvar como apareceu, com o botão Esperar por este" width="1360" height="840" loading="lazy">
+            <figcaption>Enquanto você grava, o Vestro anota o que acontece no sistema. Depois é só clicar na seta e escolher <b>Esperar por este</b>: a macro passa a esperar a janela, e não um tempo fixo.</figcaption>
+          </figure>
+          <figure class="shot">
+            <video controls preload="none" poster="img/funcoes.png" width="1280" height="720">
+              <source src="media/funcoes.webm" type="video/webm">
+            </video>
+            <figcaption>Funções: monte o texto que vai ser colado juntando memórias, listas e o número da volta do loop.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== licencas -->
+    <section class="section" id="licencas">
+      <div class="wrap">
+        <p class="eyebrow">Licenças</p>
+        <h2>Para você ou para a equipe toda</h2>
+
+        <!-- Sem script: escolher Fixa ou Flutuante troca precos e botoes so pelo CSS (:has). Fixa vem marcada. -->
+        <div class="pricing">
+          <fieldset class="kinds">
+            <legend class="sr-only">Tipo de licença</legend>
+            <label class="kind">
+              <input class="sr-only" type="radio" name="tipo" value="fixa" checked aria-labelledby="tipo-fixa" aria-describedby="tipo-fixa-desc">
+              <span class="kind-dot" aria-hidden="true"></span>
+              <span class="kind-name" id="tipo-fixa">Fixa</span>
+              <span class="kind-sub">1 computador</span>
+              <span class="kind-text" id="tipo-fixa-desc">A licença fica no primeiro computador que usar a chave. Para trocar de PC, o computador atual aprova o pedido.</span>
+            </label>
+            <label class="kind">
+              <input class="sr-only" type="radio" name="tipo" value="flutuante" aria-labelledby="tipo-flutuante" aria-describedby="tipo-flutuante-desc">
+              <span class="kind-dot" aria-hidden="true"></span>
+              <span class="kind-name" id="tipo-flutuante">Flutuante</span>
+              <span class="kind-sub">vagas para a equipe</span>
+              <span class="kind-text" id="tipo-flutuante-desc">Uma chave com várias vagas, e você paga por vaga. Cada PC que abre o Vestro ocupa uma vaga e devolve quando fecha.</span>
+            </label>
+          </fieldset>
+
+          <div class="plans">
+            <article class="plan">
+              <h3>Mensal</h3>
+              <p class="plan-kind swap"><span class="is-fixa">Licença fixa</span><span class="is-flut">Licença flutuante</span></p>
+              <p class="price swap" aria-live="polite">
+                <span class="is-fixa"><span class="cur">R$</span>39,90<span class="per">/mês</span></span>
+                <span class="is-flut"><span class="cur">R$</span>129,90<span class="per">/mês por vaga</span></span>
+              </p>
+              <p>Para começar sem compromisso. Renova mês a mês.</p>
+              <a class="btn btn-ghost is-fixa" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Mensal%2C%20R%24%2039%2C90%20por%20m%C3%AAs." rel="noopener noreferrer" target="_blank">Quero a fixa mensal</a>
+              <a class="btn btn-ghost is-flut" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Mensal%2C%20R%24%20129%2C90%20por%20vaga%20por%20m%C3%AAs.%20Vagas%20que%20preciso%3A%20" rel="noopener noreferrer" target="_blank">Quero a flutuante mensal</a>
+            </article>
+            <article class="plan featured">
+              <span class="badge">Recomendada</span>
+              <h3>Anual</h3>
+              <p class="plan-kind swap"><span class="is-fixa">Licença fixa</span><span class="is-flut">Licença flutuante</span></p>
+              <p class="price swap" aria-live="polite">
+                <span class="is-fixa"><span class="cur">R$</span>399,00<span class="per">/ano</span></span>
+                <span class="is-flut"><span class="cur">R$</span>1.299,00<span class="per">/ano por vaga</span></span>
+              </p>
+              <p class="equiv swap"><span class="is-fixa">sai por R$ 33,25 por mês</span><span class="is-flut">sai por R$ 108,25 por vaga, por mês</span></p>
+              <p>12 meses de uso pelo preço de 10, para quem já usa no dia a dia.</p>
+              <a class="btn btn-primary is-fixa" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Anual%2C%20R%24%20399%2C00%20por%20ano." rel="noopener noreferrer" target="_blank">Quero a fixa anual</a>
+              <a class="btn btn-primary is-flut" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Anual%2C%20R%24%201.299%2C00%20por%20vaga%20por%20ano.%20Vagas%20que%20preciso%3A%20" rel="noopener noreferrer" target="_blank">Quero a flutuante anual</a>
+            </article>
+          </div>
+
+          <div class="buy">
+            <h3>Como comprar</h3>
+            <ol>
+              <li>Escolha fixa ou flutuante e clique no botão do plano: o WhatsApp abre com a mensagem pronta. Na flutuante, diga quantas vagas precisa.</li>
+              <li>Combinamos o pagamento.</li>
+              <li>Você recebe a chave <code>VSTR-…</code> e cola no Vestro.</li>
+            </ol>
+            <p class="fine">Em breve: compra direto pelo site, com a chave liberada na hora.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== baixar -->
+    <section class="section alt" id="baixar">
+      <div class="wrap">
+        <div class="download">
+          <img src="img/logo.png" alt="" width="96" height="96">
+          <div class="download-text">
+            <h2>Baixe o Vestro Macro</h2>
+            <p>Versão 2.0 para Windows 10 e 11 (64 bits). Um arquivo só, sem instalação: é só abrir e colar a chave de licença.</p>
+          </div>
+          <a class="btn btn-primary btn-big" href="https://github.com/vitorschoepping/vestromacro/releases/latest/download/VestroMacro.exe">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>
+            Baixar para Windows
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== duvidas -->
+    <section class="section" id="duvidas">
+      <div class="wrap narrow">
+        <p class="eyebrow">Dúvidas</p>
+        <h2>Perguntas frequentes</h2>
+        <details>
+          <summary>Preciso de internet?</summary>
+          <p>Para ativar e conferir a licença, sim. A licença fixa continua funcionando por até 5 dias sem internet. A flutuante precisa da conexão para segurar a vaga.</p>
+        </details>
+        <details>
+          <summary>Posso trocar de computador?</summary>
+          <p>Pode. No computador novo, digite a chave e peça para usar a licença ali: o computador atual aprova. Depois disso, ela fica 90 dias sem poder mudar de novo. Se o computador antigo não existe mais (formatou, quebrou), <a href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Preciso%20de%20ajuda%20para%20trocar%20minha%20licen%C3%A7a%20do%20Vestro%20Macro%20de%20computador." rel="noopener noreferrer" target="_blank">entre em contato com o suporte via WhatsApp</a>.</p>
+        </details>
+        <details>
+          <summary>O Windows ou o antivírus avisou sobre o arquivo</summary>
+          <p>Programas que controlam o teclado e o mouse às vezes são sinalizados por precaução. Baixe o Vestro só por este site. Se aparecer “O Windows protegeu o computador”, clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>.</p>
+        </details>
+        <details>
+          <summary>A macro não clica num programa aberto como administrador</summary>
+          <p>O Windows não deixa um programa comum controlar outro que está aberto como administrador. Feche o Vestro e abra com o botão direito, em <b>Executar como administrador</b>. O próprio Vestro avisa quando isso acontece.</p>
+        </details>
+        <details>
+          <summary>Como levo meus workflows para outro computador?</summary>
+          <p>Em cada workflow, use <b>Exportar</b>: sai um arquivo <code>.json</code> que você importa no outro PC. O mesmo arquivo serve de backup e para mandar o workflow para outra pessoa.</p>
+        </details>
+        <details>
+          <summary>Funciona no Mac ou no Linux?</summary>
+          <p>Não. O Vestro Macro é para Windows 10 e 11.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ===================================================== contato -->
+    <section class="section contact" id="contato">
+      <div class="wrap narrow center">
+        <h2>Suporte via WhatsApp</h2>
+        <p class="lead">Dúvidas, orçamento para equipes, compra de licenças e suporte.</p>
+        <a class="btn btn-whats btn-big" href="https://wa.me/5547988769948?text=Ol%C3%A1!%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20Vestro%20Macro." rel="noopener noreferrer" target="_blank">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19.5l1.1-3.6A8 8 0 1 1 9 18.9z"/><path d="M9.2 8.6c.4 2.6 2.2 4.6 4.9 5.3l1.3-1.2 1.9.9-.3 1.5c-4.3.4-8.4-3.4-8.6-7.6l1.5-.4.9 1.9z"/></svg>
+          WhatsApp (47) 98876-9948
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span class="brand small"><img src="img/logo.png" alt="" width="24" height="24"><span>Vestro Macro</span></span>
+      <span>© 2026 Vestro Macro · Feito para Windows 10 e 11</span>
+      <span class="foot-links"><a href="privacidade.html">Privacidade</a><a href="#topo">Voltar ao topo ↑</a></span>
+    </div>
+  </footer>
+</body>
+</html>
