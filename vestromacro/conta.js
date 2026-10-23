@@ -1,5 +1,6 @@
 /* conta.js — area do cliente no site: botao Entrar, aba lateral de quem entrou e compra fora do Brasil;
-   paginas de entrar, criar conta, confirmar o e-mail e criar senha nova (links do e-mail).
+   paginas de entrar, criar conta, confirmar o e-mail e criar senha nova (links do e-mail);
+   compra pelo Mercado Pago (pagina comprar: escolher o plano, pagar e a volta do pagamento, com a chave).
 
    O unico script do site (CSP script-src 'self'). Chama a API do Worker no mesmo endereco,
    /vestromacro/api/conta (server/cloudflare/src/conta.js); a sessao fica num cookie HttpOnly que
@@ -14,6 +15,9 @@
   const RECOLHIDA = "vestro_aba_recolhida";
   const ANONIMO = "vestro_conta_anonimo";         // quem nao entrou: guarda o "pode comprar" por 5 min,
   const ANONIMO_MS = 5 * 60 * 1000;               // para cada pagina aberta nao gastar um pedido do Worker
+  const VOLTAR = "vestro_conta_voltar";           // pagina para voltar depois de entrar (ex.: a compra que pediu login)
+  const NOME_PLANO = { monthly: "/mês", annual: "/ano" };
+  let pagamentoLigado = false;                    // a API disse que a compra pelo site esta ligada (Mercado Pago)
 
   const TIPO = { fixed: "Fixa · 1 computador", floating: "Flutuante" };
   const PLANO = { monthly: "Mensal", annual: "Anual", lifetime: "Vitalícia" };
@@ -56,13 +60,13 @@
     if (usarGuardado) {
       try {
         const g = JSON.parse(lembrar(ANONIMO) || "null");
-        if (g && Date.now() - g.em < ANONIMO_MS) return { ok: true, compra: g.compra, conta: null };
+        if (g && Date.now() - g.em < ANONIMO_MS) return { ok: true, compra: g.compra, pagamento: g.pagamento, precos: g.precos, conta: null };
       } catch (e) { /* guardado estragado: pergunta de novo */ }
     }
     const r = await fetch(API, { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
     if (!r.ok) throw new Error("estado " + r.status);
     const e = await r.json();
-    guardar(ANONIMO, e.conta ? null : JSON.stringify({ em: Date.now(), compra: e.compra }));
+    guardar(ANONIMO, e.conta ? null : JSON.stringify({ em: Date.now(), compra: e.compra, pagamento: e.pagamento, precos: e.precos }));
     return e;
   }
 
@@ -118,7 +122,14 @@
     guardar(AVISO, aviso || "");
     guardar(RECOLHIDA, null);
     guardar(ANONIMO, null);
-    location.assign(SITE);
+    location.assign(destino());
+  }
+
+  /** Para onde ir depois de entrar: a pagina que pediu o login (so do proprio site), ou o inicio. */
+  function destino() {
+    const v = lembrar(VOLTAR);
+    guardar(VOLTAR, null);
+    return v && v.startsWith(SITE) && !v.startsWith("//") ? v : SITE;
   }
 
   /** Troca o formulario por um aviso de "mandamos o e-mail". */
@@ -141,7 +152,7 @@
       },
     });
     // ja entrou? volta para o site
-    estado().then((e) => { if (e.conta) location.replace(SITE); }).catch(() => {});
+    estado().then((e) => { if (e.conta) location.replace(destino()); }).catch(() => {});
   }
 
   function paginaEsqueci(form) {
@@ -200,6 +211,195 @@
     }
   }
 
+  // ------------------------------------------------------------ compra pelo site (Mercado Pago)
+  const reais = (centavos) => (Number(centavos) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  /** Os botoes de plano levam a pagina comprar (no lugar do WhatsApp), e o "Como comprar" troca de lista. */
+  function compraPeloSite() {
+    for (const a of document.querySelectorAll("a.comprar[data-tipo]")) {
+      a.setAttribute("href", `comprar?${new URLSearchParams({ tipo: a.dataset.tipo, plano: a.dataset.plano })}`);
+      a.removeAttribute("target");
+      a.removeAttribute("rel");
+    }
+    for (const c of document.querySelectorAll(".como-whats")) c.hidden = true;
+    for (const c of document.querySelectorAll(".como-site")) c.hidden = false;
+  }
+
+  /** Copia o texto; sem permissao, deixa a chave a mostra para copiar a mao. */
+  async function copiar(texto, botao) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      botao.textContent = "Copiada";
+    } catch (e) {
+      botao.textContent = "Selecione e copie";
+    }
+  }
+
+  /** Endereco do pagamento: so do Mercado Pago (o servidor manda, mas o script confere antes de ir). */
+  function doMercadoPago(endereco) {
+    try {
+      const u = new URL(endereco);
+      return u.protocol === "https:" && /(^|\.)mercadopago\.com(\.br)?$/.test(u.hostname);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function paginaComprar(form) {
+    const q = new URLSearchParams(location.search);
+    const bloco = (id) => document.getElementById(id);
+    // a volta do Mercado Pago traz external_reference (a compra) e payment_id; o resto da URL sai
+    const compraId = (q.get("external_reference") || q.get("compra") || "").slice(0, 40);
+    const pagamento = (q.get("payment_id") || q.get("collection_id") || q.get("pagamento") || "").replace(/\D/g, "").slice(0, 20);
+    if (compraId) {
+      const limpa = new URLSearchParams({ compra: compraId });
+      if (pagamento) limpa.set("pagamento", pagamento);
+      history.replaceState(null, "", `${location.pathname}?${limpa}`);
+    }
+    estado().then((e) => {
+      if (!e.conta) {
+        guardar(VOLTAR, location.pathname + location.search);
+        bloco("compra-entrar").hidden = false;
+        return;
+      }
+      // no topo, o "Entrar" vira o nome de quem entrou (leva para a conta, no inicio do site)
+      const entrar = document.querySelector("a.conta-entrar");
+      if (entrar) {
+        entrar.textContent = String(e.conta.nome || "").trim().split(/\s+/)[0] || "Minha conta";
+        entrar.setAttribute("href", SITE);
+      }
+      if (compraId) return voltaDoPagamento(compraId, pagamento);
+      if (!e.pagamento) {
+        if (!e.compra) {
+          bloco("compra-off-titulo").textContent = "Compra temporariamente indisponível fora do Brasil";
+          bloco("compra-off-texto").textContent = "Você já pode baixar e usar grátis por 30 dias, com tudo liberado.";
+        }
+        bloco("compra-off").hidden = false;
+        return;
+      }
+      escolherPlano(form, e, q);
+    }).catch(() => { bloco("compra-off").hidden = false; });
+  }
+
+  function escolherPlano(form, e, q) {
+    const caixa = form.querySelector(".conta-msg");
+    const botao = form.querySelector("button[type=submit]");
+    const vagas = form.querySelector("input[name=vagas]");
+    const marcar = (nome, valor) => {
+      const r = form.querySelector(`input[name=${nome}][value="${valor}"]`);
+      if (r) r.checked = true;
+    };
+    form.hidden = false;
+    let renovar = null;
+    const licId = q.get("licenca");
+    if (licId) {
+      renovar = e.conta.licencas.find((l) => l.id === licId && l.pode_renovar) || null;
+      document.getElementById("compra-titulo").textContent = "Renovar licença";
+      if (!renovar) {
+        mensagem(caixa, "Essa licença não pode ser renovada pelo site. Fale com o suporte via WhatsApp.", "erro");
+        botao.disabled = true;
+        return;
+      }
+      const vence = renovar.situacao === "vencida" ? `venceu em ${dataBr(renovar.vence)}` : `vale até ${dataBr(renovar.vence)}`;
+      document.getElementById("compra-sub").textContent =
+        `Chave terminada em ${renovar.final}, ${vence}. O período novo começa no vencimento (ou hoje, se já venceu); a chave continua a mesma.`;
+      marcar("tipo", renovar.tipo);
+      marcar("plano", renovar.plano === "annual" ? "annual" : "monthly");
+      document.getElementById("compra-tipo").disabled = true;
+      vagas.value = String(renovar.vagas);
+      vagas.disabled = true;
+    } else {
+      marcar("tipo", q.get("tipo"));
+      marcar("plano", q.get("plano"));
+    }
+    const escolhido = (nome) => (form.querySelector(`input[name=${nome}]:checked`) || {}).value;
+    const nVagas = () => (escolhido("tipo") === "floating" ? Number(vagas.value) : 1);
+    function atualizar() {
+      const tipo = escolhido("tipo");
+      document.getElementById("compra-vagas").hidden = tipo !== "floating";
+      const n = nVagas();
+      const ok = Number.isInteger(n) && n >= 1 && n <= 50;
+      for (const p of form.querySelectorAll(".compra-preco")) {
+        const v = e.precos[tipo][p.dataset.plano];
+        p.textContent = `${reais(v)}${NOME_PLANO[p.dataset.plano]}${tipo === "floating" ? " por vaga" : ""}`;
+      }
+      document.getElementById("compra-total").textContent = ok ? reais(e.precos[tipo][escolhido("plano")] * n) : "—";
+    }
+    form.addEventListener("input", atualizar);
+    atualizar();
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const n = nVagas();
+      if (!Number.isInteger(n) || n < 1 || n > 50) return mensagem(caixa, "Escolha de 1 a 50 vagas. Mais que isso: fale com a gente pelo WhatsApp.", "erro");
+      botao.disabled = true;
+      mensagem(caixa, "", "erro");
+      const r = await enviar("/comprar", { tipo: escolhido("tipo"), plano: escolhido("plano"), vagas: String(n), licenca: renovar ? renovar.id : "" });
+      if (r.ok && doMercadoPago(r.url)) return location.assign(r.url);
+      botao.disabled = false;
+      mensagem(caixa, r.ok ? "Algo deu errado. Tente de novo daqui a pouco." : (r.mensagem || "Não deu certo. Tente de novo."), "erro");
+    });
+  }
+
+  /** Volta do Mercado Pago: o servidor confere o pagamento (com o Mercado Pago) e mostra a chave. */
+  function voltaDoPagamento(compraId, pagamento) {
+    const caixa = document.getElementById("compra-volta");
+    const titulo = document.getElementById("compra-titulo");
+    const sub = document.getElementById("compra-sub");
+    caixa.hidden = false;
+    titulo.textContent = "Conferindo o pagamento…";
+    sub.textContent = "";
+    let tentativas = 0;
+    const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes);
+    const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, "Ir para minha conta"));
+    async function conferir() {
+      const r = await enviar("/compra", { compra: compraId, pagamento });
+      if (!r.ok) {
+        titulo.textContent = "Não deu para conferir agora";
+        return mostrar("Tente de novo daqui a pouco", el("p", {}, r.mensagem || ""),
+          el("p", { class: "compra-acoes" }, el("button", { class: "btn btn-ghost", type: "button", onclick: conferir }, "Conferir de novo")));
+      }
+      if (r.situacao === "aprovada" && r.renovacao) {
+        titulo.textContent = "Licença renovada";
+        return mostrar("Pagamento aprovado",
+          el("p", {}, `A licença com a chave terminada em ${r.final} agora vale até ${dataBr(r.vence)}. A chave continua a mesma: não precisa fazer nada no Vestro Macro.`),
+          el("p", {}, "Mandamos a confirmação para o seu e-mail."), irParaConta());
+      }
+      if (r.situacao === "aprovada") {
+        titulo.textContent = "Pagamento aprovado";
+        const copiarBotao = el("button", { class: "btn btn-ghost", type: "button", onclick: () => copiar(r.chave, copiarBotao) }, "Copiar");
+        return mostrar("Sua chave",
+          r.chave ? el("div", { class: "compra-chave" }, el("code", {}, r.chave), copiarBotao) : null,
+          el("p", {}, "No Vestro Macro, digite essa chave onde ele pede a licença."),
+          el("p", {}, `Também mandamos a chave para o seu e-mail. Ela fica na sua conta, para copiar quando precisar${r.vence ? `, e vale até ${dataBr(r.vence)}` : ""}.`),
+          irParaConta());
+      }
+      if (r.situacao === "pendente") {
+        titulo.textContent = "Pagamento em análise";
+        const fim = ++tentativas >= 24;
+        if (!fim) setTimeout(conferir, 5000);
+        return mostrar("Aguardando o Mercado Pago",
+          el("p", {}, "Assim que o pagamento for aprovado, a chave aparece aqui, na sua conta e no seu e-mail. Pix costuma levar alguns segundos."),
+          fim ? el("p", {}, "Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.") : null);
+      }
+      if (r.situacao === "recusada") {
+        titulo.textContent = "Pagamento não aprovado";
+        return mostrar("O Mercado Pago não aprovou o pagamento",
+          el("p", {}, "Tente de novo, se quiser com outra forma de pagamento."),
+          el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, "Tentar de novo")));
+      }
+      if (r.situacao === "devolvida") {
+        titulo.textContent = "Pagamento devolvido";
+        return mostrar("Esse pagamento foi devolvido", el("p", {}, r.renovacao
+          ? "O período dessa renovação saiu da licença. Dúvidas: suporte via WhatsApp."
+          : "A licença dessa compra foi bloqueada. Dúvidas: suporte via WhatsApp."), irParaConta());
+      }
+      titulo.textContent = "Recebemos o pagamento";
+      return mostrar("Precisamos conferir uma coisa",
+        el("p", {}, "O valor pago não bateu com o pedido, então a chave não saiu sozinha. Fale com o suporte via WhatsApp (47) 98876-9948: resolvemos rápido."));
+    }
+    conferir();
+  }
+
   // ------------------------------------------------------------ aba lateral
   let campos = 0;
   /** Campo como nas paginas de entrar: div.campo com o rotulo ligado ao input pelo id. */
@@ -209,6 +409,26 @@
   }
 
   function licencaItem(l) {
+    const acoes = el("div", { class: "aba-lic-acoes" });
+    const mostra = el("p");
+    if (l.tem_chave) {
+      const botao = el("button", { type: "button", onclick: async () => {
+        botao.disabled = true;
+        const r = await enviar("/chave", { licenca: l.id });
+        botao.disabled = false;
+        if (!r.ok) {
+          mostra.className = "conta-msg erro";
+          mostra.textContent = r.mensagem || "Não deu certo. Tente de novo.";
+        } else {
+          mostra.className = "aba-chave-inteira";
+          mostra.textContent = r.chave;               // a mostra tambem, se o navegador nao deixar copiar
+          await copiar(r.chave, botao);
+        }
+        acoes.before(mostra);
+      } }, "Copiar a chave");
+      acoes.append(botao);
+    }
+    if (pagamentoLigado && l.pode_renovar) acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, "Renovar"));
     let situacao, aviso = false;
     if (l.situacao === "bloqueada") { situacao = "Bloqueada"; aviso = true; }
     else if (l.situacao === "vencida") { situacao = `Vencida em ${dataBr(l.vence)}`; aviso = true; }
@@ -217,10 +437,12 @@
     const onde = l.tipo === "floating"
       ? `${l.em_uso} de ${l.vagas} em uso agora`
       : (l.computador ? `No computador ${l.computador}` : "Ainda não ativada em nenhum computador");
-    return el("li", { class: "aba-lic" },
+    const item = el("li", { class: "aba-lic" },
       el("div", { class: "aba-lic-topo" }, el("h3", {}, tipo), el("span", { class: aviso ? "aba-status aviso" : "aba-status" }, situacao)),
       el("p", { class: "aba-chave" }, `${PLANO[l.plano] || l.plano} · chave terminada em ${l.final}`),
-      el("p", {}, onde));
+      el("p", {}, onde),
+      acoes.childElementCount ? acoes : null);
+    return item;
   }
 
   function abrirAba(aberta) {
@@ -322,8 +544,11 @@
     if (form("form-esqueci")) return paginaEsqueci(form("form-esqueci"));
     if (form("form-confirmar")) return paginaConfirmar(form("form-confirmar"), linkDoEmail());
     if (form("form-redefinir")) return paginaRedefinir(form("form-redefinir"), linkDoEmail());
+    if (form("form-comprar")) return paginaComprar(form("form-comprar"));
     estado({ usarGuardado: true }).then((e) => {
       if (!e.compra) compraIndisponivel();
+      pagamentoLigado = Boolean(e.pagamento);
+      if (pagamentoLigado) compraPeloSite();
       if (e.conta) {
         const aviso = lembrar(AVISO);
         guardar(AVISO, null);

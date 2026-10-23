@@ -10,9 +10,9 @@
   <meta name="description" content="Grave o que você faz no teclado e no mouse e repita com um clique. Fluxo visual, esperas por janela e imagem, loops, listas, copiar e colar com memórias. Para Windows 10 e 11.">
   <meta name="theme-color" content="#0b0d11">
   <link rel="icon" href="img/icone.png">
-  <link rel="stylesheet" href="styles.css?v=281c294e">
+  <link rel="stylesheet" href="styles.css?v=1d4bc1ea">
   <!-- unico script do site: conta (Entrar, aba lateral) e compra fora do Brasil -->
-  <script src="conta.js?v=dc98a948" defer></script>
+  <script src="conta.js?v=26faa042" defer></script>
 </head>
 <body>
 <div class="page">
@@ -164,7 +164,8 @@
           </div>
         </header>
 
-        <!-- Fora do Brasil o conta.js troca os botoes .comprar e o bloco .buy por "temporariamente indisponivel". -->
+        <!-- Fora do Brasil o conta.js troca os botoes .comprar e o bloco .buy por "temporariamente indisponivel".
+             Com a compra pelo site ligada (Mercado Pago), os botoes levam a pagina comprar e o "Como comprar" troca de lista. -->
         <!-- Sem script: escolher Fixa ou Flutuante troca precos e botoes so pelo CSS (:has). Fixa vem marcada. -->
         <div class="g12 pricing">
           <fieldset class="seg">
@@ -196,8 +197,8 @@
                 <span class="is-flut"><span class="cur">R$</span>129,90<span class="per">/mês por vaga</span></span>
               </p>
               <p>Para começar sem compromisso. Renova mês a mês.</p>
-              <a class="btn btn-ghost is-fixa comprar" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Mensal%2C%20R%24%2039%2C90%20por%20m%C3%AAs." rel="noopener noreferrer" target="_blank">Quero a fixa mensal</a>
-              <a class="btn btn-ghost is-flut comprar" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Mensal%2C%20R%24%20129%2C90%20por%20vaga%20por%20m%C3%AAs.%20Vagas%20que%20preciso%3A%20" rel="noopener noreferrer" target="_blank">Quero a flutuante mensal</a>
+              <a class="btn btn-ghost is-fixa comprar" data-tipo="fixed" data-plano="monthly" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Mensal%2C%20R%24%2039%2C90%20por%20m%C3%AAs." rel="noopener noreferrer" target="_blank">Quero a fixa mensal</a>
+              <a class="btn btn-ghost is-flut comprar" data-tipo="floating" data-plano="monthly" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Mensal%2C%20R%24%20129%2C90%20por%20vaga%20por%20m%C3%AAs.%20Vagas%20que%20preciso%3A%20" rel="noopener noreferrer" target="_blank">Quero a flutuante mensal</a>
             </article>
             <article class="plan featured">
               <span class="badge">Recomendada</span>
@@ -209,19 +210,24 @@
               </p>
               <p class="equiv swap"><span class="is-fixa">sai por R$ 33,25 por mês</span><span class="is-flut">sai por R$ 108,25 por vaga, por mês</span></p>
               <p>12 meses de uso pelo preço de 10, para quem já usa no dia a dia.</p>
-              <a class="btn btn-primary is-fixa comprar" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Anual%2C%20R%24%20399%2C00%20por%20ano." rel="noopener noreferrer" target="_blank">Quero a fixa anual</a>
-              <a class="btn btn-primary is-flut comprar" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Anual%2C%20R%24%201.299%2C00%20por%20vaga%20por%20ano.%20Vagas%20que%20preciso%3A%20" rel="noopener noreferrer" target="_blank">Quero a flutuante anual</a>
+              <a class="btn btn-primary is-fixa comprar" data-tipo="fixed" data-plano="annual" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Anual%2C%20R%24%20399%2C00%20por%20ano." rel="noopener noreferrer" target="_blank">Quero a fixa anual</a>
+              <a class="btn btn-primary is-flut comprar" data-tipo="floating" data-plano="annual" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Anual%2C%20R%24%201.299%2C00%20por%20vaga%20por%20ano.%20Vagas%20que%20preciso%3A%20" rel="noopener noreferrer" target="_blank">Quero a flutuante anual</a>
             </article>
           </div>
 
           <div class="buy">
             <h3>Como comprar</h3>
-            <ol>
+            <ol class="como-whats">
               <li>Escolha fixa ou flutuante e clique no botão do plano: o WhatsApp abre com a mensagem pronta. Na flutuante, diga quantas vagas precisa.</li>
               <li>Combinamos o pagamento.</li>
               <li>Você recebe a chave <code>VSTR-…</code> e ativa no Vestro. Tudo o que você montou no teste continua lá.</li>
             </ol>
-            <p class="fine">Em breve: compra direto pelo site, com a chave liberada na hora.</p>
+            <p class="fine como-whats">Em breve: compra direto pelo site, com a chave liberada na hora.</p>
+            <ol class="como-site" hidden>
+              <li>Escolha fixa ou flutuante e clique no botão do plano. Entre na sua conta do site (ou crie uma em um minuto).</li>
+              <li>Pague com Pix ou cartão pelo Mercado Pago.</li>
+              <li>A chave <code>VSTR-…</code> sai na hora: na sua conta e no seu e-mail. Ative no Vestro: tudo o que você montou no teste continua lá.</li>
+            </ol>
             <p class="aviso-regiao" role="status"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.3"/></svg>Fora do Brasil, a compra está temporariamente indisponível. Você já pode baixar e usar grátis por 30 dias, com tudo liberado.</p>
           </div>
         </div>

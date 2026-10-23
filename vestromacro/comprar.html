@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Compra pelo site: o conta.js pede o pagamento a API do Worker (server/cloudflare/src/compra.js) e mostra a volta do Mercado Pago. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Comprar · Vestro Macro</title>
+  <meta name="theme-color" content="#0b0d11">
+  <link rel="icon" href="img/icone.png">
+  <link rel="stylesheet" href="styles.css?v=1d4bc1ea">
+  <script src="conta.js?v=26faa042" defer></script>
+</head>
+<body>
+<div class="page">
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="index.html#topo" aria-label="Vestro Macro, início">
+        <img src="img/logo.png" alt="" width="28" height="28"><span>Vestro Macro</span>
+      </a>
+      <nav aria-label="Seções">
+        <a href="index.html#recursos">Recursos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="tutoriais.html">Tutoriais</a>
+        <a href="index.html#licencas">Licenças</a>
+        <a href="index.html#duvidas">Dúvidas</a>
+        <a href="index.html#contato">Contato</a>
+      </nav>
+      <div class="nav-act">
+        <a class="btn btn-sm btn-primary" href="index.html#baixar">Baixar</a>
+        <a class="conta-entrar" href="login">Entrar</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo" class="conta-pg">
+    <div class="conta-cartao compra-cartao">
+      <header>
+        <h1 id="compra-titulo">Comprar licença</h1>
+        <p id="compra-sub">Pague com Pix ou cartão pelo Mercado Pago. A chave sai na hora: por e-mail e na sua conta.</p>
+      </header>
+
+      <!-- o conta.js mostra um destes blocos: escolher o plano, entrar na conta, compra fora do ar, ou a volta do pagamento -->
+      <form id="form-comprar" method="post" novalidate hidden>
+        <p class="conta-msg" role="alert" aria-live="assertive"></p>
+        <fieldset class="escolha" id="compra-tipo">
+          <legend>Tipo de licença</legend>
+          <label><input type="radio" name="tipo" value="fixed" checked> <span><strong>Fixa</strong> <small>1 computador</small></span></label>
+          <label><input type="radio" name="tipo" value="floating"> <span><strong>Flutuante</strong> <small>vagas para a equipe</small></span></label>
+        </fieldset>
+        <fieldset class="escolha">
+          <legend>Plano</legend>
+          <label><input type="radio" name="plano" value="monthly" checked> <span><strong>Mensal</strong> <small class="compra-preco" data-plano="monthly"></small></span></label>
+          <label><input type="radio" name="plano" value="annual"> <span><strong>Anual</strong> <small class="compra-preco" data-plano="annual"></small></span></label>
+        </fieldset>
+        <div class="campo" id="compra-vagas" hidden>
+          <label for="compra-vagas-n">Vagas</label>
+          <input id="compra-vagas-n" name="vagas" type="number" min="1" max="50" step="1" value="1" inputmode="numeric">
+          <small>Cada computador aberto ao mesmo tempo usa uma vaga. Mais de 50: fale com a gente pelo WhatsApp.</small>
+        </div>
+        <p class="compra-total">Total: <strong id="compra-total">R$ 0,00</strong></p>
+        <button class="btn btn-primary" type="submit">Pagar com Mercado Pago</button>
+        <p class="compra-fine">Você vai para o site do Mercado Pago e volta para cá depois de pagar. Não guardamos dados de cartão.</p>
+      </form>
+
+      <div class="conta-enviado" id="compra-entrar" hidden>
+        <h2>Entre na sua conta para comprar</h2>
+        <p>A licença fica ligada à sua conta: a chave aparece nela e chega no seu e-mail.</p>
+        <p class="compra-acoes"><a class="btn btn-primary" href="login">Entrar</a><a class="btn btn-ghost" href="createaccount">Criar conta</a></p>
+      </div>
+
+      <div class="conta-enviado" id="compra-off" hidden>
+        <h2 id="compra-off-titulo">Compra pelo site indisponível no momento</h2>
+        <p id="compra-off-texto">Você pode comprar pelo WhatsApp, com a mensagem pronta.</p>
+        <p class="compra-acoes"><a class="btn btn-primary" href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro." rel="noopener noreferrer" target="_blank">Comprar pelo WhatsApp</a></p>
+      </div>
+
+      <div class="conta-enviado" id="compra-volta" hidden role="status" aria-live="polite"></div>
+
+      <noscript><p class="conta-msg">Para comprar pelo site, o navegador precisa estar com o JavaScript ligado. Ou compre pelo <a href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro." rel="noopener noreferrer" target="_blank">WhatsApp</a>.</p></noscript>
+      <p class="conta-alt">Dúvidas? <a href="https://wa.me/5547988769948?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20a%20compra%20do%20Vestro%20Macro." rel="noopener noreferrer" target="_blank">Suporte via WhatsApp</a></p>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span class="brand"><img src="img/logo.png" alt="" width="22" height="22"><span>Vestro Macro</span></span>
+      <span>© 2026 Vestro Macro · Feito para Windows 10 e 11</span>
+      <span class="foot-links"><a href="privacidade.html">Privacidade</a><a href="#conteudo">Voltar ao topo ↑</a></span>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
