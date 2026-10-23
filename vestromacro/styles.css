@@ -108,8 +108,6 @@ code { font: .86em var(--mono); color: #d3e2f6; background: var(--bg-2); border:
 .win-ctl { margin-left: auto; display: flex; height: 100%; }
 .win-ctl span { width: 46px; display: grid; place-items: center; color: var(--ink-3); }
 .win-ctl .i { width: 11px; height: 11px; stroke-width: 1.2; }
-.win-crop { aspect-ratio: 1044 / 810; overflow: hidden; }
-.win-crop img { width: 130.27%; max-width: none; }
 
 .shot { margin: 0; }
 .frame { border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; background: var(--bg-2); }
