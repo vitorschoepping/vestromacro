@@ -1,4 +1,4 @@
-# Cabecalhos de seguranca do site no Cloudflare Pages (o GitHub Pages ignora este arquivo).
+# Cabecalhos de seguranca de todo o dominio no Cloudflare Pages (vale para /vestromacro/ e o que vier depois).
 # A CSP e a mesma da <meta> de cada pagina, mais o frame-ancestors (so funciona em cabecalho):
 # nenhum script, nada de fora, e ninguem coloca o site dentro de outra pagina.
 /*
