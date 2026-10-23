@@ -1,8 +1,8 @@
 # Cabecalhos de seguranca de todo o dominio no Cloudflare Pages (vale para /vestromacro/ e o que vier depois).
 # A CSP e a mesma da <meta> de cada pagina, mais o frame-ancestors (so funciona em cabecalho):
-# nenhum script, nada de fora, e ninguem coloca o site dentro de outra pagina.
+# so o script do proprio site (conta.js), nada de fora, e ninguem coloca o site dentro de outra pagina.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: no-referrer

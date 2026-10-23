@@ -4,23 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Gerado por tools/tutoriais/make_site.js a partir de vestro_macro/web/tutoriais.js: edite la, nao aqui.
-       Mesma politica do index.html: nenhum script, nenhum recurso de fora. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+       Mesma politica do index.html: so o conta.js do site, nenhum recurso de fora. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Tutoriais · Vestro Macro</title>
   <meta name="description" content="Vídeos curtos de como usar o Vestro Macro: gravar, reproduzir, editar, ver e mudar cliques, memórias, constantes, listas e funções.">
-  <meta name="theme-color" content="#070a10">
+  <meta name="theme-color" content="#0b0d11">
   <link rel="icon" href="img/icone.png">
   <link rel="stylesheet" href="styles.css">
+  <!-- unico script do site: conta (Entrar, aba lateral) e compra fora do Brasil -->
+  <script src="conta.js" defer></script>
   <link rel="stylesheet" href="tutoriais.css">
 </head>
 <body>
+<div class="page">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="nav">
     <div class="wrap nav-in">
       <a class="brand" href="index.html" aria-label="Vestro Macro, início">
-        <img src="img/logo.png" alt="" width="34" height="34"><span>Vestro Macro</span>
+        <img src="img/logo.png" alt="" width="28" height="28"><span>Vestro Macro</span>
       </a>
       <nav aria-label="Seções">
         <a href="index.html#recursos">Recursos</a>
@@ -30,7 +33,10 @@
         <a href="index.html#duvidas">Dúvidas</a>
         <a href="index.html#contato">Contato</a>
       </nav>
-      <a class="btn btn-small btn-primary" href="index.html#baixar">Baixar</a>
+      <div class="nav-act">
+        <a class="btn btn-sm btn-primary" href="index.html#baixar">Baixar</a>
+        <a class="conta-entrar" href="login">Entrar</a>
+      </div>
     </div>
   </header>
 
@@ -214,10 +220,11 @@
 
   <footer class="foot">
     <div class="wrap foot-in">
-      <span class="brand small"><img src="img/logo.png" alt="" width="24" height="24"><span>Vestro Macro</span></span>
+      <span class="brand"><img src="img/logo.png" alt="" width="22" height="22"><span>Vestro Macro</span></span>
       <span>© 2026 Vestro Macro · Feito para Windows 10 e 11</span>
       <span class="foot-links"><a href="privacidade.html">Privacidade</a><a href="#conteudo">Voltar ao topo ↑</a></span>
     </div>
   </footer>
+</div>
 </body>
 </html>

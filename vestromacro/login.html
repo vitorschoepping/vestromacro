@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Area do cliente: o formulario e enviado pelo conta.js para a API do Worker (server/cloudflare/src/conta.js). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Entrar · Vestro Macro</title>
+  <meta name="theme-color" content="#0b0d11">
+  <link rel="icon" href="img/icone.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="conta.js" defer></script>
+</head>
+<body>
+<div class="page">
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="index.html#topo" aria-label="Vestro Macro, início">
+        <img src="img/logo.png" alt="" width="28" height="28"><span>Vestro Macro</span>
+      </a>
+      <nav aria-label="Seções">
+        <a href="index.html#recursos">Recursos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="tutoriais.html">Tutoriais</a>
+        <a href="index.html#licencas">Licenças</a>
+        <a href="index.html#duvidas">Dúvidas</a>
+        <a href="index.html#contato">Contato</a>
+      </nav>
+      <div class="nav-act">
+        <a class="btn btn-sm btn-primary" href="index.html#baixar">Baixar</a>
+        <a class="conta-entrar" href="login">Entrar</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo" class="conta-pg">
+    <div class="conta-cartao">
+      <header>
+        <h1>Entrar</h1>
+        <p>Veja suas licenças e mantenha seu e-mail e telefone em dia.</p>
+      </header>
+      <form id="form-entrar" method="post" novalidate>
+        <p class="conta-msg" role="alert" aria-live="assertive"></p>
+        <div class="campo">
+          <label for="entrar-email">E-mail</label>
+          <input id="entrar-email" name="email" type="email" autocomplete="email" inputmode="email" required>
+        </div>
+        <div class="campo">
+          <div class="campo-linha"><label for="entrar-senha">Senha</label><a href="forgotpassword">Esqueci minha senha</a></div>
+          <input id="entrar-senha" name="senha" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Entrar</button>
+      </form>
+      <noscript><p class="conta-msg">Para entrar na conta, o navegador precisa estar com o JavaScript ligado.</p></noscript>
+      <p class="conta-alt">Ainda não tem conta? <a href="createaccount">Criar conta</a></p>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span class="brand"><img src="img/logo.png" alt="" width="22" height="22"><span>Vestro Macro</span></span>
+      <span>© 2026 Vestro Macro · Feito para Windows 10 e 11</span>
+      <span class="foot-links"><a href="privacidade.html">Privacidade</a><a href="#conteudo">Voltar ao topo ↑</a></span>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
