@@ -1,6 +1,8 @@
 # Redirecionamentos de todo o dominio (Cloudflare Pages). O site do Vestro Macro fica em /vestromacro/;
 # a raiz fica livre para outros produtos. Enquanto nao houver pagina na raiz, ela leva ao Vestro Macro (302:
-# temporario, para o navegador nao guardar). Os enderecos de antes da pasta (2026-10-23) levam para o novo (301).
+# temporario, para o navegador nao guardar). O .exe 2.2.1 mostra "vestroautomation.com" no aviso de atualizacao:
+# uma pagina nova na raiz precisa ter um link claro para /vestromacro/. Os enderecos de antes da pasta (2026-10-23)
+# levam para o novo (301).
 /                   /vestromacro/                   302
 /index.html         /vestromacro/                   301
 /privacidade.html   /vestromacro/privacidade.html   301
