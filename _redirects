@@ -9,7 +9,8 @@
 /tutoriais.html     /vestromacro/tutoriais.html     301
 
 # Arquivos do repositorio publico que nao fazem parte do site (o Pages publica a raiz inteira).
-# A pasta docs/ e so do endereco antigo, no GitHub Pages.
+# A pasta docs/ e so do endereco antigo, no GitHub Pages; functions/ e o codigo da Pages Function da API.
 /README.md          /vestromacro/                   301
 /CLAUDE.md          /vestromacro/                   301
 /docs/*             /vestromacro/                   301
+/functions/*        /vestromacro/                   301
