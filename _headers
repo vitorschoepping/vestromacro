@@ -1,0 +1,19 @@
+# Cabecalhos de seguranca do site no Cloudflare Pages (o GitHub Pages ignora este arquivo).
+# A CSP e a mesma da <meta> de cada pagina, mais o frame-ancestors (so funciona em cabecalho):
+# nenhum script, nada de fora, e ninguem coloca o site dentro de outra pagina.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin
+
+# O endereco *.pages.dev do projeto (e o das versoes de teste) mostra o mesmo site:
+# fica fora do Google, para a busca levar so ao vestroautomation.com.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex

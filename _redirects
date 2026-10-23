@@ -1,0 +1,5 @@
+# Arquivos do repositorio publico que nao fazem parte do site (o Cloudflare Pages publica a raiz inteira).
+# A pasta docs/ e so do endereco antigo, no GitHub Pages.
+/README.md / 301
+/CLAUDE.md / 301
+/docs/* / 301
