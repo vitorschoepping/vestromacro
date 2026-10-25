@@ -413,10 +413,13 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
 .conta-cartao [id^="compra-"][hidden] { display: none; }
 .escolha { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .escolha legend { font-size: .88rem; font-weight: 560; color: var(--ink); margin-bottom: 7px; padding: 0; }
-.escolha label { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--bg); cursor: pointer; }
+.escolha label { position: relative; display: flex; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--bg); cursor: pointer; }
 .escolha label:has(input:checked) { border-color: var(--blue); background: #0f1a2a; }
 .escolha label:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 2px; }
-.escolha input { margin-top: 3px; accent-color: var(--blue); }
+/* sem a bolinha: o cartao inteiro e o botao (o radio fica invisivel por cima, para teclado e leitor de tela) */
+.escolha input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.escolha[disabled] input { cursor: default; }
+@media (forced-colors: active) { .escolha label:has(input:checked) { outline: 3px solid Highlight; outline-offset: 2px; } }
 .escolha span { display: grid; gap: 2px; }
 .escolha strong { font-weight: 600; }
 .escolha small { font-size: .82rem; color: var(--ink-3); }
