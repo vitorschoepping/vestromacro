@@ -251,8 +251,10 @@
     const bloco = (id) => document.getElementById(id);
     // a volta da assinatura (renovacao automatica) traz o id dela, que o servidor pos no endereco (vale antes do resto:
     // o Mercado Pago pode juntar o external_reference); a volta da compra traz external_reference e payment_id
-    const assinaturaId = (q.get("assinatura") || "").slice(0, 40);
-    const compraId = assinaturaId ? "" : (q.get("external_reference") || q.get("compra") || "").slice(0, 40);
+    // os ids sao hexadecimais; o Mercado Pago gruda "?preapproval_id=..." no fim do endereco de volta da assinatura
+    const soId = (v) => ((v || "").match(/^[0-9a-f]{1,40}/) || [""])[0];
+    const assinaturaId = soId(q.get("assinatura"));
+    const compraId = assinaturaId ? "" : soId(q.get("external_reference") || q.get("compra"));
     const pagamento = (q.get("payment_id") || q.get("collection_id") || q.get("pagamento") || "").replace(/\D/g, "").slice(0, 20);
     if (assinaturaId) history.replaceState(null, "", `${location.pathname}?${new URLSearchParams({ assinatura: assinaturaId })}`);
     if (compraId) {
