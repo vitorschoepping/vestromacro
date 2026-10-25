@@ -469,6 +469,56 @@
     return el("div", { class: "campo" }, el("label", { for: id }, rotulo), el("input", { ...attrs, id }), dica ? el("small", {}, dica) : null);
   }
 
+  // as mesmas opcoes de MOTIVOS_CANCELAMENTO (server/cloudflare/src/compra.js); "outro" pede o texto
+  const MOTIVOS = [
+    ["caro", "Está caro"],
+    ["nao_uso", "Não estou usando o Vestro Macro"],
+    ["pagar_avulso", "Prefiro pagar quando precisar, sem cobrança automática"],
+    ["faltou_recurso", "Faltou um recurso de que eu preciso"],
+    ["problema", "Tive problemas com o programa"],
+    ["outra_ferramenta", "Vou usar outra ferramenta"],
+    ["outro", "Outro motivo"],
+  ];
+
+  /** Janela que pergunta o motivo antes de cancelar a renovacao automatica. feito() roda quando cancelou. */
+  function perguntarMotivo(assinatura, feito) {
+    const opcoes = MOTIVOS.map(([valor, texto]) =>
+      el("label", {}, el("input", { type: "radio", name: "motivo", value: valor, required: true }), el("span", {}, el("strong", {}, texto))));
+    const nota = el("textarea", { name: "nota", rows: 3, maxlength: 500, placeholder: "Conte para a gente o motivo" });
+    const campoNota = el("label", { class: "cancelar-nota", hidden: true }, el("span", {}, "Qual é o motivo?"), nota);
+    const msg = el("p", { class: "conta-msg" });
+    const confirmar = el("button", { type: "submit", class: "btn btn-primary" }, "Cancelar a renovação");
+    const voltar = el("button", { type: "button", class: "btn btn-ghost", onclick: () => janela.close() }, "Voltar");
+    const form = el("form", { method: "dialog" },
+      el("h2", { id: "cancelar-titulo" }, "Por que você quer cancelar?"),
+      el("p", {}, "A licença continua valendo até o vencimento. Depois disso, não haverá mais cobranças."),
+      el("fieldset", { class: "escolha escolha-lista" }, el("legend", {}, "Motivo"), opcoes),
+      campoNota, msg,
+      el("div", { class: "cancelar-botoes" }, voltar, confirmar));
+    const janela = el("dialog", { class: "cancelar-janela", "aria-labelledby": "cancelar-titulo" }, form);
+    form.addEventListener("change", () => {
+      const outro = form.elements.motivo.value === "outro";
+      campoNota.hidden = !outro;
+      nota.required = outro;
+    });
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const motivo = form.elements.motivo.value;
+      const texto = nota.value.trim();
+      if (!motivo) return mensagem(msg, "Escolha um motivo.", "erro");
+      if (motivo === "outro" && !texto) { mensagem(msg, "Escreva o motivo.", "erro"); return nota.focus(); }
+      confirmar.disabled = voltar.disabled = true;
+      const r = await enviar("/cancelar", { assinatura, motivo, nota: motivo === "outro" ? texto : "" });
+      confirmar.disabled = voltar.disabled = false;
+      if (!r.ok) return mensagem(msg, r.mensagem || "Não deu certo. Tente de novo.", "erro");
+      janela.close();
+      feito();
+    });
+    janela.addEventListener("close", () => janela.remove());
+    document.body.append(janela);
+    janela.showModal();
+  }
+
   function licencaItem(l) {
     const acoes = el("div", { class: "aba-lic-acoes" });
     const mostra = el("p");
@@ -489,32 +539,18 @@
       } }, "Copiar a chave");
       acoes.append(botao);
     }
-    // renovacao automatica ligada: mostra a proxima cobranca e o botao de cancelar (pede confirmacao); sem ela, "Renovar"
+    // renovacao automatica ligada: mostra a proxima cobranca e o botao de cancelar (abre a janela do motivo); sem ela, "Renovar"
     let auto = null;
     if (l.assinatura) {
       const a = l.assinatura;
       auto = el("p", { class: "aba-auto" }, a.situacao === "pausada"
         ? "Renovação automática pausada no Mercado Pago"
         : `Renovação automática ligada${a.proxima ? ` · próxima cobrança em ${dataBr(a.proxima)}` : ""}`);
-      let confirmar = false;
-      const cancelar = el("button", { type: "button", onclick: async () => {
-        if (!confirmar) {
-          confirmar = true;
-          cancelar.textContent = "Confirmar: não renovar mais";
-          return;
-        }
-        cancelar.disabled = true;
-        const r = await enviar("/cancelar", { assinatura: a.id });
-        if (!r.ok) {
-          cancelar.disabled = false;
-          mostra.className = "conta-msg erro";
-          mostra.textContent = r.mensagem || "Não deu certo. Tente de novo.";
-          return acoes.before(mostra);
-        }
+      const cancelar = el("button", { type: "button", onclick: () => perguntarMotivo(a.id, () => {
         auto.textContent = `Renovação automática cancelada: a licença vale até ${l.vence ? dataBr(l.vence) : "o vencimento"} e não haverá mais cobranças.`;
         cancelar.remove();
         if (pagamentoLigado && l.pode_renovar) acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, "Renovar"));
-      } }, "Cancelar renovação automática");
+      }) }, "Cancelar renovação automática");
       acoes.append(cancelar);
     } else if (pagamentoLigado && l.pode_renovar) {
       acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, "Renovar"));
@@ -531,6 +567,7 @@
       el("div", { class: "aba-lic-topo" }, el("h3", {}, tipo), el("span", { class: aviso ? "aba-status aviso" : "aba-status" }, situacao)),
       el("p", { class: "aba-chave" }, `${PLANO[l.plano] || l.plano} · chave terminada em ${l.final}`),
       el("p", {}, onde),
+      l.motivo ? el("p", { class: "aba-auto aviso" }, l.motivo) : null,
       auto,
       acoes.childElementCount ? acoes : null);
     return item;

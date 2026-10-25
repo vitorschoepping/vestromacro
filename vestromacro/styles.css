@@ -439,3 +439,19 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
   .node { animation: none; }
   *, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; }
 }
+
+/* ------------------------------------------------ janela do motivo ao cancelar a renovacao automatica (conta.js) */
+.cancelar-janela { width: min(460px, 100% - 32px); max-height: calc(100% - 32px); padding: 0; border: 1px solid var(--line-2); border-radius: 14px; background: var(--bg-1); color: var(--ink); }
+.cancelar-janela::backdrop { background: rgba(5, 8, 12, .7); }
+.cancelar-janela form { display: grid; gap: 16px; padding: 24px; }
+.cancelar-janela h2 { font-size: 1.25rem; font-weight: 640; letter-spacing: -.02em; }
+.cancelar-janela form > p { color: var(--ink-2); font-size: .92rem; }
+.escolha-lista { grid-template-columns: 1fr; gap: 8px; }
+.escolha-lista label { padding: 10px 14px; }
+.escolha-lista strong { font-weight: 520; }
+.cancelar-nota { display: grid; gap: 6px; font-size: .88rem; font-weight: 560; }
+.cancelar-nota[hidden] { display: none; }
+.cancelar-nota textarea { font: .95rem/1.4 var(--sans); color: var(--ink); background: var(--bg); border: 1px solid var(--line-2); border-radius: 8px; padding: 10px 12px; resize: vertical; }
+.cancelar-nota textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.cancelar-botoes { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.aba-auto.aviso { color: var(--erro); }
