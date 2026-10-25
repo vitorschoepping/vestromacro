@@ -402,6 +402,7 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
 .aba-conta .aba-sair { height: auto; padding: 0; border: 0; }
 .aba-conta .aba-sair:hover { background: none; color: var(--ink); text-decoration: underline; }
 .aba-lic-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.aba-auto { font-size: .85rem; color: var(--ink-2); }
 .aba-conta a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 .aba-conta a.btn:hover { background: var(--bg-2); border-color: #3b4452; }
 .aba-chave-inteira { font: .82rem var(--mono); color: var(--ink); overflow-wrap: anywhere; user-select: all; }
@@ -422,6 +423,8 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
 .escolha[disabled] label { cursor: default; opacity: .75; }
 .compra-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; border-top: 1px solid var(--line); color: var(--ink-2); }
 .compra-total strong { font-size: 1.35rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.compra-total { flex-wrap: wrap; }
+.compra-total small { flex-basis: 100%; text-align: right; font-size: .82rem; color: var(--ink-3); }
 .compra-fine { font-size: .82rem; color: var(--ink-3); }
 .compra-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .compra-chave { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--bg); }

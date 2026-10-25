@@ -10,8 +10,8 @@
   <title>Comprar · Vestro Macro</title>
   <meta name="theme-color" content="#0b0d11">
   <link rel="icon" href="img/icone.png">
-  <link rel="stylesheet" href="styles.css?v=1d4bc1ea">
-  <script src="conta.js?v=26faa042" defer></script>
+  <link rel="stylesheet" href="styles.css?v=3a53ed5e">
+  <script src="conta.js?v=d9c29af1" defer></script>
 </head>
 <body>
 <div class="page">
@@ -41,7 +41,7 @@
     <div class="conta-cartao compra-cartao">
       <header>
         <h1 id="compra-titulo">Comprar licença</h1>
-        <p id="compra-sub">Pague com Pix ou cartão pelo Mercado Pago. A chave sai na hora: por e-mail e na sua conta.</p>
+        <p id="compra-sub">Pague pelo Mercado Pago. A chave sai na hora: por e-mail e na sua conta.</p>
       </header>
 
       <!-- o conta.js mostra um destes blocos: escolher o plano, entrar na conta, compra fora do ar, ou a volta do pagamento -->
@@ -62,7 +62,12 @@
           <input id="compra-vagas-n" name="vagas" type="number" min="1" max="50" step="1" value="1" inputmode="numeric">
           <small>Cada computador aberto ao mesmo tempo usa uma vaga. Mais de 50: fale com a gente pelo WhatsApp.</small>
         </div>
-        <p class="compra-total">Total: <strong id="compra-total">R$ 0,00</strong></p>
+        <fieldset class="escolha" id="compra-renovacao">
+          <legend>Renovação</legend>
+          <label><input type="radio" name="automatica" value="1" checked> <span><strong>Automática</strong> <small>cobra no cartão a cada período; cancele quando quiser na sua conta</small></span></label>
+          <label><input type="radio" name="automatica" value="0"> <span><strong>Pagar uma vez</strong> <small>Pix ou cartão; renove na sua conta quando vencer</small></span></label>
+        </fieldset>
+        <p class="compra-total">Total: <strong id="compra-total">R$ 0,00</strong> <small id="compra-periodo"></small></p>
         <button class="btn btn-primary" type="submit">Pagar com Mercado Pago</button>
         <p class="compra-fine">Você vai para o site do Mercado Pago e volta para cá depois de pagar. Não guardamos dados de cartão.</p>
       </form>
