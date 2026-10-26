@@ -215,14 +215,14 @@
   // ------------------------------------------------------------ compra pelo site (Mercado Pago)
   const reais = (centavos) => (Number(centavos) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  /** Os botoes de plano levam a pagina comprar (no lugar do WhatsApp), e o "Como comprar" troca de lista. */
+  /** Os botoes de plano levam a pagina comprar (no lugar do e-mail), e o "Como comprar" troca de lista. */
   function compraPeloSite() {
     for (const a of document.querySelectorAll("a.comprar[data-tipo]")) {
       a.setAttribute("href", `comprar?${new URLSearchParams({ tipo: a.dataset.tipo, plano: a.dataset.plano })}`);
       a.removeAttribute("target");
       a.removeAttribute("rel");
     }
-    for (const c of document.querySelectorAll(".como-whats")) c.hidden = true;
+    for (const c of document.querySelectorAll(".como-email")) c.hidden = true;
     for (const c of document.querySelectorAll(".como-site")) c.hidden = false;
   }
 
@@ -303,7 +303,7 @@
       renovar = e.conta.licencas.find((l) => l.id === licId && l.pode_renovar) || null;
       document.getElementById("compra-titulo").textContent = "Renovar licença";
       if (!renovar) {
-        mensagem(caixa, "Essa licença não pode ser renovada pelo site. Fale com o suporte via WhatsApp.", "erro");
+        mensagem(caixa, "Essa licença não pode ser renovada pelo site. Fale com o suporte: contato@vestroautomation.com.", "erro");
         botao.disabled = true;
         return;
       }
@@ -342,7 +342,7 @@
     form.addEventListener("submit", async (ev) => {
       ev.preventDefault();
       const n = nVagas();
-      if (!Number.isInteger(n) || n < 1 || n > 50) return mensagem(caixa, "Escolha de 1 a 50 vagas. Mais que isso: fale com a gente pelo WhatsApp.", "erro");
+      if (!Number.isInteger(n) || n < 1 || n > 50) return mensagem(caixa, "Escolha de 1 a 50 vagas. Mais que isso: fale com a gente em contato@vestroautomation.com.", "erro");
       botao.disabled = true;
       mensagem(caixa, "", "erro");
       const r = await enviar("/comprar", { tipo: escolhido("tipo"), plano: escolhido("plano"), vagas: String(n),
@@ -403,12 +403,12 @@
       if (r.situacao === "devolvida") {
         titulo.textContent = "Pagamento devolvido";
         return mostrar("Esse pagamento foi devolvido", el("p", {}, r.renovacao
-          ? "O período dessa renovação saiu da licença. Dúvidas: suporte via WhatsApp."
-          : "A licença dessa compra foi bloqueada. Dúvidas: suporte via WhatsApp."), irParaConta());
+          ? "O período dessa renovação saiu da licença. Dúvidas: contato@vestroautomation.com."
+          : "A licença dessa compra foi bloqueada. Dúvidas: contato@vestroautomation.com."), irParaConta());
       }
       titulo.textContent = "Recebemos o pagamento";
       return mostrar("Precisamos conferir uma coisa",
-        el("p", {}, "O valor pago não bateu com o pedido, então a chave não saiu sozinha. Fale com o suporte via WhatsApp (47) 98876-9948: resolvemos rápido."));
+        el("p", {}, "O valor pago não bateu com o pedido, então a chave não saiu sozinha. Fale com o suporte em contato@vestroautomation.com: resolvemos rápido."));
     }
     conferir();
   }
@@ -596,7 +596,7 @@
 
     const lista = conta.licencas.length
       ? el("ul", { class: "aba-lista" }, conta.licencas.map(licencaItem))
-      : el("p", { class: "aba-vazio" }, "Nenhuma licença na sua conta ainda. Comprou pelo WhatsApp? Adicione a chave aqui embaixo.");
+      : el("p", { class: "aba-vazio" }, "Nenhuma licença na sua conta ainda. Recebeu a chave de outro jeito? Adicione aqui embaixo.");
 
     const fLicenca = el("form", { class: "aba-form", method: "post", novalidate: true },
       campo("Chave", { name: "chave", required: true, maxlength: 64, placeholder: "VSTR-XXXXX-XXXXX-XXXXX-XXXXX", autocomplete: "off", spellcheck: "false" }),

@@ -13,7 +13,7 @@
   --blue: #3d9bff;
   --blue-ink: #86c2ff;
   --blue-btn: #1a6fd6;
-  --key: #6ea6ff; --mouse: #e9b04f; --clip: #e47ab8; --list: #ac90ff; --loop: #52d3a2; --whats: #3fcf76;
+  --key: #6ea6ff; --mouse: #e9b04f; --clip: #e47ab8; --list: #ac90ff; --loop: #52d3a2;
   --erro: #ff8a8a;
   --sans: "Segoe UI Variable Text", "Segoe UI Variable", Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --display: "Segoe UI Variable Display", "Segoe UI Variable", "Inter Display", Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
@@ -62,7 +62,7 @@ code { font: .86em var(--mono); color: #d3e2f6; background: var(--bg-2); border:
 .btn-primary:hover { background: #2179e2; color: #fff; }
 .btn-ghost { background: transparent; border-color: var(--line-2); }
 .btn-ghost:hover { background: var(--bg-2); border-color: #3b4452; }
-.btn-whats .i { color: var(--whats); }
+.btn-email .i { color: var(--blue); }
 .btn-sm { height: 34px; padding: 0 13px; font-size: .875rem; border-radius: 7px; }
 .btn-lg { height: 50px; padding: 0 24px; font-size: 1rem; }
 /* fora do Brasil o conta.js desativa a compra */
