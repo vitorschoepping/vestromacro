@@ -509,7 +509,7 @@ body { background: #030407; }
 .malha { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: .7; }
 /* veu preto por cima da malha (e por baixo do conteudo): escurece o fundo sem mexer no texto.
    Com a aba da conta aberta no celular, o mesmo ::after vira a sombra que fecha a aba (precisa receber o toque). */
-body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: rgb(0 0 0 / .9); }
+body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: rgb(0 0 0 / .78); }
 body.aba-aberta::after { pointer-events: auto; }
 /* no celular o texto ocupa a largura toda: sem malha (o malha.js tambem para) */
 @media (max-width: 900px) { .malha { display: none; } }
