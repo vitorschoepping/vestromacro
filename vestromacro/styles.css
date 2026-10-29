@@ -514,6 +514,26 @@ body.aba-aberta::after { pointer-events: auto; }
 /* no celular o texto ocupa a largura toda: sem malha (o malha.js tambem para) */
 @media (max-width: 900px) { .malha { display: none; } }
 
+/* ---- Aba da conta como cartao de vidro flutuante: solta das bordas, cantos arredondados e transparente,
+   com a malha aparecendo desfocada atras; por dentro, licencas e campos no padrao dos cartoes dos passos */
+.aba-conta {
+  top: 12px; right: 12px; bottom: 12px; width: calc(var(--aba) - 24px);
+  border: 1px solid rgb(255 255 255 / .1); border-radius: 20px;
+  background: rgb(14 17 25 / .45);
+  backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .06) inset, 0 30px 60px -20px rgb(0 0 0 / .7);
+  transform: translateX(calc(100% + 24px));
+}
+.aba-perfil, .aba-dados, .aba-dados > div { border-color: rgb(255 255 255 / .08); }
+.aba-lic { border-radius: 14px; border-color: rgb(255 255 255 / .09); background: rgb(255 255 255 / .03); }
+.aba-conta .campo input { background: rgb(0 0 0 / .28); border-color: rgb(255 255 255 / .1); }
+.aba-conta button:hover { background: rgb(255 255 255 / .06); }
+@media (max-width: 999px) { .aba-conta { width: min(var(--aba) - 24px, 100% - 56px); } }
+/* tela larga: o veu preto fica mais fraco atras da aba, para a malha aparecer pelo vidro */
+@media (min-width: 1000px) {
+  body.aba-aberta::after { background: linear-gradient(to left, rgb(0 0 0 / .45) var(--aba), rgb(0 0 0 / .9) calc(var(--aba) + 160px)); }
+}
+
 /* ---- Menu translucido: vidro escuro com borda clara fina */
 .nav {
   background: rgb(10 11 16 / .45);
