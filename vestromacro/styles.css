@@ -19,7 +19,8 @@
   --display: "Segoe UI Variable Display", "Segoe UI Variable", "Inter Display", Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --mono: "Cascadia Mono", "Cascadia Code", "SF Mono", Consolas, ui-monospace, monospace;
   --aba: 380px;
-  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease: cubic-bezier(.23, 1, .32, 1);
+  --ease-gaveta: cubic-bezier(.32, .72, 0, 1);
   /* nomes antigos, usados pelo tutoriais.css (gerado por tools/tutoriais/make_site.js) */
   --text: var(--ink); --muted: var(--ink-2); --faint: var(--ink-3);
   --panel: var(--bg-1); --raised: var(--bg-2); --font: var(--sans);
@@ -28,7 +29,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 112px; -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; transition: padding-right .3s var(--ease); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; transition: padding-right .3s var(--ease-gaveta); }
 img, video { max-width: 100%; height: auto; display: block; }
 a { color: var(--blue-ink); text-decoration: none; }
 a:hover { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
@@ -55,7 +56,8 @@ code { font: .86em var(--mono); color: #d3e2f6; background: var(--bg-2); border:
 .main { grid-column: 4 / 13; }
 
 /* ------------------------------------------------ botoes */
-.btn, .conta-entrar, .conta-botao { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: 8px; border: 1px solid transparent; font: 560 .95rem/1 var(--sans); color: var(--ink); white-space: nowrap; cursor: pointer; transition: background-color .15s ease, border-color .15s ease, opacity .2s ease; }
+.btn, .conta-entrar, .conta-botao { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: 8px; border: 1px solid transparent; font: 560 .95rem/1 var(--sans); color: var(--ink); white-space: nowrap; cursor: pointer; transition: background-color .15s ease, border-color .15s ease, opacity .2s ease, transform .16s var(--ease); }
+.btn:active, .conta-entrar:active, .conta-botao:active { transform: scale(.97); }
 .btn:hover, .conta-entrar:hover { text-decoration: none; color: var(--ink); }
 .btn .i { width: 18px; height: 18px; }
 .btn-primary { background: var(--blue-btn); border-color: #2c80e6; color: #fff; }
@@ -93,9 +95,18 @@ code { font: .86em var(--mono); color: #d3e2f6; background: var(--bg-2); border:
 /* ------------------------------------------------ abertura */
 .hero { padding: 112px 0 0; }
 .hero h1 { font-size: clamp(2.5rem, 6cqi, 5rem); font-weight: 640; line-height: 1.03; letter-spacing: -.042em; }
-.hero h1 .h1-sub { color: var(--ink-3); }
-.hero-grid { margin-top: 44px; row-gap: 32px; align-items: end; }
-.hero-grid .lead { grid-column: 1 / 8; }
+/* a frase de apoio vira um subtitulo: menor, mais leve e numa linha so, para nao quebrar "por voce" sozinho */
+.hero h1 .h1-sub { display: block; margin-top: .5em; font-size: .46em; font-weight: 520; line-height: 1.2; letter-spacing: -.022em; color: var(--ink-3); }
+/* titulo e texto a esquerda; a direita, um cartao no padrao dos passos (icone, titulo, texto e botoes),
+   centralizado na altura de todo o bloco da esquerda */
+.hero-grid { row-gap: 32px; align-items: center; }
+.hero-texto { grid-column: 1 / 8; }
+.hero-texto .lead { margin-top: 44px; }
+.hero-side { padding: 22px 20px 24px; border: 1px solid var(--line-2); border-radius: 14px; background: rgb(255 255 255 / .025); }
+.hero-side .buy-ico { margin-bottom: 14px; }
+.hero-side-titulo { margin: 0 0 6px; font: 620 1.35rem/1.2 var(--display); letter-spacing: -.03em; color: var(--ink); }
+.hero-side .fine { margin: 0 0 20px; }
+.hero-side .cta { display: grid; }
 .hero-side { grid-column: 9 / 13; }
 .cta { display: flex; gap: 10px; flex-wrap: wrap; }
 .lead { font-size: 1.125rem; line-height: 1.6; color: var(--ink-2); max-width: 62ch; }
@@ -136,7 +147,7 @@ h2 { font-size: clamp(2rem, 3.8cqi, 3rem); font-weight: 640; line-height: 1.07; 
 
 /* pedacinho de workflow, igual ao editor do app */
 .flow-demo { display: grid; gap: 22px; padding: 28px 24px; border: 1px solid var(--line); border-radius: 12px; background-color: var(--bg); background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / .05) 1px, transparent 0); background-size: 20px 20px; }
-.flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 4px; padding-bottom: 20px; }
+.flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 28px 4px; padding-bottom: 20px; }
 .start { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink-2); }
 .start .i { width: 12px; height: 12px; fill: currentColor; stroke: none; margin-left: 2px; }
 .edge { position: relative; display: grid; justify-items: center; min-width: 54px; padding-bottom: 6px; font: 600 .78rem/1.3 var(--mono); }
@@ -181,7 +192,7 @@ h2 { font-size: clamp(2rem, 3.8cqi, 3rem); font-weight: 640; line-height: 1.07; 
 .seg { grid-column: 1 / 5; margin: 0; padding: 0; border: 0; min-width: 0; display: grid; gap: 18px; align-content: start; }
 .seg legend { font: 500 .75rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding: 0; margin-bottom: 12px; }
 .seg-track { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border: 1px solid var(--line-2); border-radius: 11px; background: var(--bg-1); }
-.seg-track::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 8px; background: var(--bg-2); box-shadow: inset 0 0 0 1px #2f6db8, 0 1px 2px rgb(0 0 0 / .4); transition: transform .35s var(--ease); }
+.seg-track::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 8px; background: var(--bg-2); box-shadow: inset 0 0 0 1px #2f6db8, 0 1px 2px rgb(0 0 0 / .4); transition: transform .2s var(--ease); }
 .seg-track:has(input[value="flutuante"]:checked)::before { transform: translateX(100%); }
 .seg-opt { position: relative; z-index: 1; display: grid; gap: 2px; padding: 10px 14px; border-radius: 8px; cursor: pointer; text-align: center; }
 .seg-opt:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 2px; }
@@ -207,11 +218,11 @@ h2 { font-size: clamp(2rem, 3.8cqi, 3rem); font-weight: 640; line-height: 1.07; 
 .badge { position: absolute; top: 30px; right: 28px; font: 500 .72rem/1 var(--mono); color: var(--blue-ink); border: 1px solid #2a5487; border-radius: 999px; padding: 5px 9px; }
 /* troca animada: os dois valores no mesmo lugar; o escondido fica visibility: hidden (leitor de tela le so o escolhido) */
 .swap { display: grid; }
-.swap > * { grid-area: 1 / 1; transition: opacity .3s ease, transform .45s var(--ease), visibility 0s; }
+.swap > * { grid-area: 1 / 1; transition: opacity .2s ease, transform .22s var(--ease), visibility 0s; }
 .swap > .is-flut,
-.pricing:has(input[value="flutuante"]:checked) .swap > .is-fixa { opacity: 0; visibility: hidden; transition-delay: 0s, 0s, .45s; }
-.swap > .is-flut { transform: translateY(40%); }
-.pricing:has(input[value="flutuante"]:checked) .swap > .is-fixa { transform: translateY(-40%); }
+.pricing:has(input[value="flutuante"]:checked) .swap > .is-fixa { opacity: 0; visibility: hidden; transition-delay: 0s, 0s, .22s; }
+.swap > .is-flut { transform: translateY(8px); }
+.pricing:has(input[value="flutuante"]:checked) .swap > .is-fixa { transform: translateY(-8px); }
 .pricing:has(input[value="flutuante"]:checked) .swap > .is-flut { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
 .plan .btn.is-flut,
 .pricing:has(input[value="flutuante"]:checked) .plan .btn.is-fixa { display: none; }
@@ -220,7 +231,7 @@ h2 { font-size: clamp(2rem, 3.8cqi, 3rem); font-weight: 640; line-height: 1.07; 
 .buy h3 { grid-column: 1 / 5; font-size: 1.2rem; font-weight: 600; letter-spacing: -.015em; }
 .buy ol { grid-column: 5 / 13; margin: 0; padding: 0; list-style: none; counter-reset: c; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; color: var(--ink-2); font-size: .95rem; }
 .buy li { counter-increment: c; }
-.buy li::before { content: counter(c, decimal-leading-zero); display: block; font: 500 .78rem var(--mono); color: var(--blue-ink); margin-bottom: 10px; }
+.buy li::before { content: counter(c); display: block; font: 500 .78rem var(--mono); color: var(--blue-ink); margin-bottom: 10px; }
 .buy .fine, .buy .aviso-regiao { grid-column: 5 / 13; margin-top: 8px; }
 
 /* ------------------------------------------------ baixar */
@@ -290,7 +301,7 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
   .nav-in { flex-wrap: wrap; height: auto; padding-top: 12px; row-gap: 4px; }
   .nav nav { order: 3; width: 100%; overflow-x: auto; margin: 0 -10px; padding-bottom: 6px; scrollbar-width: none; }
   .nav nav a { flex: none; }
-  .hero-grid .lead, .hero-side { grid-column: 1 / 13; }
+  .hero-texto, .hero-side { grid-column: 1 / 13; }
   .feat-hero-text, .feat-hero .flow-demo { grid-column: 1 / 13; }
   .seg, .plans { grid-column: 1 / 13; }
   .seg { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; column-gap: 32px; }
@@ -315,7 +326,7 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
   .steps .num { margin-bottom: 14px; }
   .show-print { margin-top: 48px; }
   .seg { grid-template-columns: 1fr; }
-  .plans { grid-template-columns: 1fr; }
+  .plans { grid-template-columns: minmax(0, 1fr); }
   .plan + .plan { border-left: 0; border-top: 1px solid var(--line-2); }
   .download { grid-template-columns: 1fr; padding: 28px 24px; gap: 20px; }
   .download img { width: 64px; height: 64px; }
@@ -332,13 +343,14 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
   .nav-in { gap: 12px; }
   .brand span { display: none; }
   .cta .btn { flex: 1 1 100%; }
-  .contact .btn { width: 100%; }
+  .contact .btn { width: 100%; padding: 0 14px; font-size: .9rem; }
+  .nav nav { mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
 }
 
 /* ------------------------------------------------ aba da conta (injetada pelo conta.js)
    body.com-conta = logado; body.aba-aberta = aba visivel.
    1000px ou mais: o conteudo encolhe (padding-right). Abaixo disso a aba abre por cima. */
-.aba-conta { position: fixed; top: 0; right: 0; bottom: 0; z-index: 40; width: var(--aba); overflow: hidden auto; overscroll-behavior: contain; background: var(--bg-1); border-left: 1px solid var(--line); padding: 16px 24px 32px; visibility: hidden; transform: translateX(100%); transition: transform .3s var(--ease), visibility 0s .3s; }
+.aba-conta { position: fixed; top: 0; right: 0; bottom: 0; z-index: 40; width: var(--aba); overflow: hidden auto; overscroll-behavior: contain; background: var(--bg-1); border-left: 1px solid var(--line); padding: 16px 24px 32px; visibility: hidden; transform: translateX(100%); transition: transform .3s var(--ease-gaveta), visibility 0s .3s; }
 .aba-aberta .aba-conta { visibility: visible; transform: none; transition-delay: 0s; }
 @media (min-width: 1000px) {
   body.aba-aberta { padding-right: var(--aba); }
@@ -455,3 +467,139 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
 .cancelar-nota textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 .cancelar-botoes { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .aba-auto.aviso { color: var(--erro); }
+
+/* ---- Transicoes ao rolar, so com CSS (animation-timeline). Chrome e Edge animam;
+   navegador sem suporte mostra tudo parado. Movimento reduzido do Windows desliga. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes surgir { from { opacity: 0; transform: translateY(32px); } }
+    @keyframes surgir-janela { from { opacity: .5; transform: perspective(1400px) rotateX(10deg) scale(.92) translateY(24px); } }
+    @keyframes barra-progresso { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes nav-sombra { to { box-shadow: 0 10px 30px -12px rgb(0 0 0 / .55); } }
+
+    .sec-head, .feat-hero, .feat, .steps li, .show-video, .show-print .frame, .show-print figcaption,
+    .seg, .plan, .buy, .download, .faq-head, .faq-list details, .contact-in {
+      animation: surgir cubic-bezier(.23, 1, .32, 1) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+    /* o vizinho da direita chega um pouco depois (efeito cascata) */
+    .feat:nth-child(even), .steps li:nth-child(2), .plan + .plan, .show-print figcaption { animation-range: entry 5% entry 38%; }
+    .steps li:nth-child(3) { animation-range: entry 10% entry 46%; }
+
+    /* print do app no topo: comeca levemente inclinado e se endireita ao rolar */
+    .win { transform-origin: 50% 0; animation: surgir-janela linear both; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+
+    /* topo: ganha sombra ao rolar e uma linha azul mostra quanto falta */
+    .nav { animation: nav-sombra linear both; animation-timeline: scroll(); animation-range: 0 160px; }
+    .nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--blue); transform-origin: 0 50%; animation: barra-progresso linear both; animation-timeline: scroll(); }
+  }
+}
+
+/* ---- Fundo: malha animada (malha.js, so na pagina inicial) atras da pagina, com um veu preto por cima;
+   as secoes ficam transparentes para ele aparecer ---- */
+:root { --roxo: #7c5cff; --roxo-ink: #b9a6ff; }
+body { background: #030407; }
+.alt { background: rgb(255 255 255 / .018); border-color: rgb(255 255 255 / .06); }
+.feat-hero, .plans, .download, .conta-cartao form { background: rgb(15 18 26 / .55); border-color: rgb(255 255 255 / .09); }
+.plan.featured { background: rgb(124 92 255 / .07); box-shadow: inset 0 2px 0 var(--blue); }
+.download { background: linear-gradient(120deg, rgb(26 111 214 / .16), rgb(124 92 255 / .14)); }
+.seg-track { background: rgb(15 18 26 / .6); }
+.eyebrow { color: var(--roxo-ink); }
+.malha { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: .7; }
+/* veu preto por cima da malha (e por baixo do conteudo): escurece o fundo sem mexer no texto.
+   Com a aba da conta aberta no celular, o mesmo ::after vira a sombra que fecha a aba (precisa receber o toque). */
+body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: rgb(0 0 0 / .9); }
+body.aba-aberta::after { pointer-events: auto; }
+/* no celular o texto ocupa a largura toda: sem malha (o malha.js tambem para) */
+@media (max-width: 900px) { .malha { display: none; } }
+
+/* ---- Menu translucido: vidro escuro com borda clara fina */
+.nav {
+  background: rgb(10 11 16 / .45);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid rgb(255 255 255 / .08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .05);
+}
+
+/* ---- Cartoes (so na pagina inicial, main.inicio): cada secao vira um cartao escuro por cima da malha.
+   Ficam empilhados: o de cima fica por cima (z-index decresce para baixo), cobre o comeco do seguinte e joga
+   a sombra nele; so a borda de baixo e arredondada, o topo de cada cartao e reto, como se continuasse por baixo
+   do anterior. Tons alternados: as secoes .alt ficam num cinza bem escuro. */
+.inicio > section { position: relative; padding: 0; }
+.inicio > section + section { margin-top: -24px; }
+.inicio > .hero { padding-top: 32px; }
+.inicio > .contact { padding-bottom: 48px; }
+.inicio > section > .wrap {
+  position: relative;
+  padding: 96px clamp(20px, 5cqi, 64px) 72px;
+  border: 1px solid rgb(255 255 255 / .08);
+  border-radius: 0 0 24px 24px;
+  background: rgb(var(--tom, 5 6 9) / .9);
+  box-shadow: 0 22px 44px -14px rgb(0 0 0 / .8), 0 1px 0 rgb(255 255 255 / .05) inset;
+}
+.inicio > .hero > .wrap { padding-top: 88px; padding-bottom: 56px; border-radius: 24px; }
+.inicio > .contact > .wrap { padding-bottom: 56px; box-shadow: 0 40px 80px -40px rgb(0 0 0 / .8), 0 1px 0 rgb(255 255 255 / .05) inset; }
+.inicio > .alt { background: none; border: 0; }
+.inicio > .alt > .wrap { --tom: 17 19 25; }
+.inicio .contact-in { border-top: 0; }
+.page:has(> .inicio) .foot { border-top: 0; }
+.inicio > section:nth-child(1) { z-index: 9; } .inicio > section:nth-child(2) { z-index: 8; }
+.inicio > section:nth-child(3) { z-index: 7; } .inicio > section:nth-child(4) { z-index: 6; }
+.inicio > section:nth-child(5) { z-index: 5; } .inicio > section:nth-child(6) { z-index: 4; }
+.inicio > section:nth-child(7) { z-index: 3; }
+@container page (max-width: 780px) {
+  .inicio > section + section { margin-top: -20px; }
+  .inicio > section > .wrap { width: calc(100% - 20px); padding: 64px 18px 44px; border-radius: 0 0 20px 20px; }
+  .inicio > .hero > .wrap { padding-top: 44px; border-radius: 20px; }
+}
+
+/* ---- Passos em cartoes: "Como comprar" com os passos em cartoes, icone, numero e seta entre eles */
+.buy { margin-top: 64px; padding-top: 40px; row-gap: 28px; }
+.buy-head { grid-column: 1 / 5; display: grid; gap: 10px; align-content: start; }
+.buy-head p { color: var(--ink-2); font-size: .95rem; max-width: 30ch; }
+.buy h3 { grid-column: auto; font-size: 1.5rem; letter-spacing: -.025em; }
+.buy ol { gap: 28px; }
+.buy li { position: relative; display: block; padding: 22px 20px 24px; border: 1px solid var(--line-2); border-radius: 14px; background: rgb(255 255 255 / .025); color: var(--ink-2); }
+.buy li::before { position: absolute; top: 22px; right: 20px; margin: 0; color: var(--ink-3); }
+.buy li:not(:last-child)::after { content: ""; position: absolute; top: 40px; right: -24px; width: 20px; height: 20px; background: var(--blue-ink); opacity: .55;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10h11m-4-4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10h11m-4-4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.buy-ico { display: grid; place-items: center; margin-bottom: 14px; width: 40px; height: 40px; border-radius: 11px; color: var(--blue-ink); background: rgb(61 155 255 / .12); box-shadow: inset 0 0 0 1px rgb(61 155 255 / .28); }
+.buy li:nth-child(3) .buy-ico { color: var(--loop); background: rgb(82 211 162 / .1); box-shadow: inset 0 0 0 1px rgb(82 211 162 / .28); }
+.buy .fine { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid rgb(124 92 255 / .35); background: rgb(124 92 255 / .08); color: var(--ink-2); }
+.buy .fine::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #9d86ff; }
+@container page (max-width: 1060px) { .buy-head { grid-column: 1 / 13; } .buy-head p { max-width: none; } }
+@container page (max-width: 780px) { .buy li:not(:last-child)::after { top: auto; bottom: -26px; right: auto; left: 30px; transform: rotate(90deg); } }
+
+/* "Tres passos" do Como funciona no mesmo padrao: cartao, icone, numero no canto e seta entre eles */
+.steps { gap: 28px; }
+.steps li { position: relative; padding: 24px 22px 26px; border: 1px solid var(--line-2); border-radius: 14px; background: rgb(255 255 255 / .025); }
+.steps .num { position: absolute; top: 24px; right: 22px; margin: 0; color: var(--ink-3); }
+.steps h3 { font-size: 1.35rem; margin-bottom: 8px; }
+.steps li:nth-child(3) .buy-ico { color: var(--loop); background: rgb(82 211 162 / .1); box-shadow: inset 0 0 0 1px rgb(82 211 162 / .28); }
+.steps li:not(:last-child)::after { content: ""; position: absolute; top: 42px; right: -24px; width: 20px; height: 20px; background: var(--blue-ink); opacity: .55;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10h11m-4-4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10h11m-4-4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+@container page (max-width: 780px) { .steps li:not(:last-child)::after { top: auto; bottom: -26px; right: auto; left: 32px; transform: rotate(90deg); } }
+
+/* ---- Cartoes saindo de baixo: ao rolar, cada cartao sai de baixo do cartao de cima e desce junto ate o lugar dele (sem mudar de tamanho).
+   A linha do tempo e a da secao (que nao se mexe), para o movimento do cartao nao mudar a propria conta.
+   So CSS; sem suporte ou com movimento reduzido, os cartoes ficam parados no lugar. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes sair-de-baixo {
+      from { transform: translateY(-240px); filter: brightness(.55); }
+      to { transform: none; filter: none; }
+    }
+    .inicio > section + section { view-timeline: --cartao block; }
+    .inicio > section + section > .wrap {
+      animation: sair-de-baixo cubic-bezier(.33, 0, .2, 1) both; /* suave no comeco e no fim */
+      animation-timeline: --cartao;
+      animation-range: entry 0px entry 640px; /* enquanto o topo do cartao sobe pela metade de baixo da tela */
+    }
+    /* o Contato e o ultimo: a pagina acaba antes dos 640 px, entao a descida usa a altura dele */
+    .inicio > .contact > .wrap { animation-range: entry 0% entry 70%; }
+  }
+}
