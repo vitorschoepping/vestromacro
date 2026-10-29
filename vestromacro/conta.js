@@ -634,20 +634,23 @@
     if (aviso) mensagem(msg, aviso, "ok");
 
     const iniciais = String(conta.nome || "").trim().split(/\s+/).slice(0, 2).map((p) => Array.from(p)[0] || "").join("").toUpperCase();
+    // cabeca (titulo, X e quem entrou) fica parada; so o corpo rola, passando por baixo dela
     const aba = el("aside", { class: "aba-conta", id: "minha-conta", "aria-label": "Minha conta" },
+      el("div", { class: "aba-cabeca" },
       el("div", { class: "aba-topo" },
         el("span", {}, "Minha conta"),
         el("button", { class: "aba-fechar", type: "button", title: "Recolher a aba", "aria-label": "Recolher a aba",
           onclick: () => abrirAba(false) }, "×")),
       el("div", { class: "aba-perfil" },
         el("span", { class: "aba-avatar", "aria-hidden": "true" }, iniciais || "?"),
-        el("div", {}, el("strong", {}, conta.nome), el("small", {}, conta.email))),
+        el("div", {}, el("strong", {}, conta.nome), el("small", {}, conta.email)))),
+      el("div", { class: "aba-corpo" },
       msg,
       el("h2", {}, "Licenças"), lista,
       el("details", { class: "aba-mais" }, el("summary", {}, "Adicionar uma licença pela chave"), fLicenca),
       el("h2", {}, "Meus dados"), fDados,
       el("details", { class: "aba-mais" }, el("summary", {}, "Trocar a senha"), fSenha),
-      sair);
+      sair));
 
     const antiga = document.getElementById("minha-conta");
     if (antiga) antiga.replaceWith(aba);

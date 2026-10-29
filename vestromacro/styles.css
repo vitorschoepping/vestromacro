@@ -514,6 +514,47 @@ body.aba-aberta::after { pointer-events: auto; }
 /* no celular o texto ocupa a largura toda: sem malha (o malha.js tambem para) */
 @media (max-width: 900px) { .malha { display: none; } }
 
+/* ---- Aba da conta como cartao de vidro flutuante: solta das bordas, cantos arredondados e transparente,
+   com a malha aparecendo desfocada atras; por dentro, licencas e campos no padrao dos cartoes dos passos */
+.aba-conta {
+  top: 12px; right: 12px; bottom: 12px; width: calc(var(--aba) - 24px);
+  border: 1px solid rgb(255 255 255 / .1); border-radius: 20px;
+  background: rgb(14 17 25 / .45);
+  backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .06) inset, 0 30px 60px -20px rgb(0 0 0 / .7);
+  transform: translateX(calc(100% + 24px));
+}
+.aba-perfil, .aba-dados, .aba-dados > div { border-color: rgb(255 255 255 / .08); }
+.aba-lic { border-radius: 14px; border-color: rgb(255 255 255 / .09); background: rgb(255 255 255 / .03); }
+.aba-conta .campo input { background: rgb(0 0 0 / .28); border-color: rgb(255 255 255 / .1); }
+.aba-conta button:hover { background: rgb(255 255 255 / .06); }
+@media (max-width: 999px) { .aba-conta { width: min(var(--aba) - 24px, 100% - 56px); } }
+/* tela larga: o veu preto fica mais fraco atras da aba, para a malha aparecer pelo vidro */
+/* barra de rolagem fina e escura, no tom do site (a do Windows, cinza e larga, destoava) */
+html { scrollbar-color: rgb(255 255 255 / .16) #030407; }
+/* dentro da aba, sem barra de rolagem: rola com a roda e o dedo (o corte do conteudo embaixo ja mostra que tem mais) */
+.aba-conta .aba-fechar { margin-right: -14px; }
+/* cabeca parada e corpo rolando por baixo dela: ao rolar, aparece uma sombra embaixo da cabeca
+   e o texto esmaece ao entrar nela (so onde o navegador anima pela rolagem) */
+.aba-conta { display: flex; flex-direction: column; padding: 0; overflow: hidden; timeline-scope: --aba-corpo; }
+.aba-cabeca { position: relative; z-index: 1; flex: none; padding: 16px 24px 0; }
+.aba-cabeca .aba-perfil { margin: 0 -14px; padding-left: 14px; padding-right: 14px; } /* a linha embaixo quase encosta nas bordas do cartao */
+.aba-corpo { flex: 1; min-height: 0; overflow: hidden auto; overscroll-behavior: contain; padding: 28px 24px 32px; scrollbar-width: none; scroll-timeline: --aba-corpo block; }
+.aba-corpo::-webkit-scrollbar { display: none; }
+.aba-cabeca::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 22px; pointer-events: none; background: linear-gradient(rgb(0 0 0 / .45), transparent); opacity: 0; }
+@supports (animation-timeline: scroll()) {
+  .aba-cabeca::after { animation: aba-sombra linear both; animation-timeline: --aba-corpo; animation-range: 0 40px; }
+  .aba-corpo { mask-image: linear-gradient(transparent, #000 var(--entra, 0px)); animation: aba-entra linear both; animation-timeline: --aba-corpo; animation-range: 0 40px; }
+}
+@property --entra { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes aba-sombra { to { opacity: 1; } }
+@keyframes aba-entra { to { --entra: 28px; } }
+@media (min-width: 1000px) {
+  /* o menu continua ate a borda da tela, por baixo do cartao da aba */
+  .nav { transition: margin-right .3s var(--ease-gaveta), padding-right .3s var(--ease-gaveta); }
+  body.aba-aberta .nav { margin-right: calc(-1 * var(--aba)); padding-right: var(--aba); }
+}
+
 /* ---- Menu translucido: vidro escuro com borda clara fina */
 .nav {
   background: rgb(10 11 16 / .45);
