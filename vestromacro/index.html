@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Site estatico: so o script do proprio site (conta.js), nenhum recurso de fora (sem fontes nem analytics); cookie so o da conta. -->
+  <!-- Site estatico: so scripts do proprio site (conta.js e malha.js), nenhum recurso de fora (sem fontes nem analytics); cookie so o da conta. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Vestro Macro · grave uma vez, o Vestro repete por você</title>
   <meta name="description" content="Grave o que você faz no teclado e no mouse e repita com um clique. Fluxo visual, esperas por janela e imagem, loops, listas, copiar e colar com memórias. Para Windows 10 e 11.">
   <meta name="theme-color" content="#0b0d11">
   <link rel="icon" href="img/icone.png">
-  <link rel="stylesheet" href="styles.css?v=8b661a33">
-  <!-- unico script do site: conta (Entrar, aba lateral) e compra fora do Brasil -->
-  <script src="conta.js?v=53b8fec4" defer></script>
+  <link rel="stylesheet" href="styles.css?v=57a509a5">
+  <!-- scripts do proprio site: conta (Entrar, aba lateral, compra fora do Brasil) e o fundo animado -->
+  <script src="conta.js?v=caf2f365" defer></script>
+  <script src="malha.js?v=73df9412" defer></script>
 </head>
 <body>
 <div class="page">
@@ -38,13 +39,18 @@
     </div>
   </header>
 
-  <main id="conteudo">
+  <main id="conteudo" class="inicio">
     <section class="hero" id="topo">
       <div class="wrap">
-        <h1>Chega de repetir<br>a mesma tarefa.<br><span class="h1-sub">Grave uma vez e o Vestro faz por você.</span></h1>
         <div class="g12 hero-grid">
-          <p class="lead">Preencher o mesmo cadastro pela centésima vez. Passar dados de um sistema para outro na mão. Clicar nos mesmos botões até o fim do expediente. É tempo que some do seu dia, e é aí que aparecem os erros de digitação. Faça a tarefa uma vez: o Vestro grava e repete quantas vezes você precisar, esperando cada tela carregar.</p>
+          <div class="hero-texto">
+            <h1>Chega de repetir<br>a mesma tarefa<br><span class="h1-sub">Grave uma vez e o Vestro faz por você</span></h1>
+            <p class="lead">Preencher o mesmo cadastro pela centésima vez. Passar dados de um sistema para outro na mão. Clicar nos mesmos botões até o fim do expediente. É tempo que some do seu dia, e é aí que aparecem os erros de digitação. Faça a tarefa uma vez: o Vestro grava e repete quantas vezes você precisar, esperando cada tela carregar.</p>
+          </div>
           <div class="hero-side">
+            <span class="buy-ico" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg></span>
+            <p class="hero-side-titulo">Teste grátis por 30 dias</p>
+            <p class="fine">Para Windows 10 e 11 · versão <span data-versao>2.2</span> · tudo liberado, sem cadastro</p>
             <div class="cta">
               <a class="btn btn-lg btn-primary" href="#baixar">
                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>
@@ -52,7 +58,6 @@
               </a>
               <a class="btn btn-lg btn-ghost" href="#licencas">Comprar licença</a>
             </div>
-            <p class="fine">Para Windows 10 e 11 · versão <span data-versao>2.2</span> · 30 dias grátis com tudo liberado, sem cadastro</p>
           </div>
         </div>
         <figure class="win">
@@ -137,9 +142,9 @@
           <h2 class="main">Três passos</h2>
         </header>
         <ol class="steps">
-          <li><span class="num">1</span><h3>Grave</h3><p>Faça a tarefa uma vez, do jeito que você já faz. O Vestro anota cada tecla e cada clique.</p></li>
-          <li><span class="num">2</span><h3>Ajuste</h3><p>Troque tempos fixos por esperas, crie loops e use listas e funções. Tudo salva sozinho.</p></li>
-          <li><span class="num">3</span><h3>Reproduza</h3><p>Mande reproduzir e deixe o Vestro repetir quantas vezes você precisar.</p></li>
+          <li><span class="buy-ico" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg></span><span class="num">1</span><h3>Grave</h3><p>Faça a tarefa uma vez, do jeito que você já faz. O Vestro anota cada tecla e cada clique.</p></li>
+          <li><span class="buy-ico" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M5 7h9m4 0h1M5 17h3m4 0h7"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></span><span class="num">2</span><h3>Ajuste</h3><p>Troque tempos fixos por esperas, crie loops e use listas e funções. Tudo salva sozinho.</p></li>
+          <li><span class="buy-ico" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="num">3</span><h3>Reproduza</h3><p>Mande reproduzir e deixe o Vestro repetir quantas vezes você precisar.</p></li>
         </ol>
         <figure class="shot show-video">
           <div class="frame"><video controls preload="none" playsinline poster="img/tutoriais/memorias.jpg" width="1920" height="1080">
@@ -216,17 +221,17 @@
           </div>
 
           <div class="buy">
-            <h3>Como comprar</h3>
+            <div class="buy-head"><h3>Como comprar</h3><p>Do plano escolhido à chave ativada no seu Vestro, em três passos.</p></div>
             <ol class="como-email">
-              <li>Escolha fixa ou flutuante e clique no botão do plano: o e-mail abre com a mensagem pronta. Na flutuante, diga quantas vagas precisa.</li>
-              <li>Combinamos o pagamento.</li>
-              <li>Você recebe a chave <code>VSTR-…</code> e ativa no Vestro. Tudo o que você montou no teste continua lá.</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5v-2M4.6 6.6 3.2 5.2M4.5 11h-2M13.4 6.6l1.4-1.4"/><path d="M9 9l11 4-4.6 1.6L13.8 19z"/></svg></span>Escolha fixa ou flutuante e clique no botão do plano: o e-mail abre com a mensagem pronta. Na flutuante, diga quantas vagas precisa.</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 10h18M7 15h4"/></svg></span>Combinamos o pagamento.</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8m-3 3 2.5 2.5M14 9l2 2"/></svg></span>Você recebe a chave <code>VSTR-…</code> e ativa no Vestro. Tudo o que você montou no teste continua lá.</li>
             </ol>
             <p class="fine como-email">Em breve: compra direto pelo site, com a chave liberada na hora.</p>
             <ol class="como-site" hidden>
-              <li>Escolha fixa ou flutuante e clique no botão do plano. Entre na sua conta do site (ou crie uma em um minuto).</li>
-              <li>Pague pelo Mercado Pago: no cartão, com renovação automática (cancele quando quiser na sua conta), ou uma vez, com Pix ou cartão.</li>
-              <li>A chave <code>VSTR-…</code> sai na hora: na sua conta e no seu e-mail. Ative no Vestro: tudo o que você montou no teste continua lá.</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5v-2M4.6 6.6 3.2 5.2M4.5 11h-2M13.4 6.6l1.4-1.4"/><path d="M9 9l11 4-4.6 1.6L13.8 19z"/></svg></span>Escolha fixa ou flutuante e clique no botão do plano. Entre na sua conta do site (ou crie uma em um minuto).</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 10h18M7 15h4"/></svg></span>Pague pelo Mercado Pago: no cartão, com renovação automática (cancele quando quiser na sua conta), ou uma vez, com Pix ou cartão.</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8m-3 3 2.5 2.5M14 9l2 2"/></svg></span>A chave <code>VSTR-…</code> sai na hora: na sua conta e no seu e-mail. Ative no Vestro: tudo o que você montou no teste continua lá.</li>
             </ol>
             <p class="aviso-regiao" role="status"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.3"/></svg>Fora do Brasil, a compra está temporariamente indisponível. Você já pode baixar e usar grátis por 30 dias, com tudo liberado.</p>
           </div>

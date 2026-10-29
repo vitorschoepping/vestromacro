@@ -633,7 +633,7 @@
     const msg = el("p", { class: "conta-msg ok" });
     if (aviso) mensagem(msg, aviso, "ok");
 
-    const iniciais = String(conta.nome || "").trim().split(/\s+/).slice(0, 2).map((p) => p[0] || "").join("").toUpperCase();
+    const iniciais = String(conta.nome || "").trim().split(/\s+/).slice(0, 2).map((p) => Array.from(p)[0] || "").join("").toUpperCase();
     const aba = el("aside", { class: "aba-conta", id: "minha-conta", "aria-label": "Minha conta" },
       el("div", { class: "aba-topo" },
         el("span", {}, "Minha conta"),
