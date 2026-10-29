@@ -12,7 +12,7 @@
   const parado = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const CORES = [[61, 155, 255], [61, 155, 255], [110, 166, 255], [124, 92, 255]]; // azul do logo e roxo do modo avancado
   const DIST = 160;
-  const INTENSIDADE = 1.4, LINHAS = 1.7; // forca da luz e das linhas (escolhidas pelo Vitor em 2026-10-29)
+  const INTENSIDADE = 1.82, LINHAS = 2.21; // forca da luz e das linhas (escolhidas pelo Vitor em 2026-10-29: 1,4 e 1,7, depois +30%)
   let largura = 0, altura = 0, pontos = [], fundo = [], quadro = 0;
 
   const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
