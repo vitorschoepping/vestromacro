@@ -1,0 +1,31 @@
+{
+ "version": 1,
+ "include": [
+  "/",
+  "/vestromacro",
+  "/vestromacro/",
+  "/vestromacro/api/*",
+  "/vestromacro/comprar",
+  "/vestromacro/comprar.html",
+  "/vestromacro/confirmemail",
+  "/vestromacro/confirmemail.html",
+  "/vestromacro/createaccount",
+  "/vestromacro/createaccount.html",
+  "/vestromacro/forgotpassword",
+  "/vestromacro/forgotpassword.html",
+  "/vestromacro/index.html",
+  "/vestromacro/login",
+  "/vestromacro/login.html",
+  "/vestromacro/privacidade",
+  "/vestromacro/privacidade.html",
+  "/vestromacro/reembolso",
+  "/vestromacro/reembolso.html",
+  "/vestromacro/resetpassword",
+  "/vestromacro/resetpassword.html",
+  "/vestromacro/termos",
+  "/vestromacro/termos.html",
+  "/vestromacro/tutoriais",
+  "/vestromacro/tutoriais.html"
+ ],
+ "exclude": []
+}

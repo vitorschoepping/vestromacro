@@ -1,16 +1,28 @@
-# Redirecionamentos de todo o dominio (Cloudflare Pages). O site do Vestro Macro fica em /vestromacro/;
-# a raiz fica livre para outros produtos. Enquanto nao houver pagina na raiz, ela leva ao Vestro Macro (302:
-# temporario, para o navegador nao guardar). O .exe 2.2.1 mostra "vestroautomation.com" no aviso de atualizacao:
-# uma pagina nova na raiz precisa ter um link claro para /vestromacro/. Os enderecos de antes da pasta (2026-10-23)
-# levam para o novo (301).
-/                   /vestromacro/                   302
+# Redirecionamentos de todo o dominio (Cloudflare Pages). O site do Vestro Macro fica em /<idioma>/vestromacro/
+# (pt-br, en, es, zh-cn); a raiz fica livre para outros produtos. A raiz e os enderecos sem idioma (/vestromacro/...)
+# nao estao aqui: quem cuida deles e a Pages Function (functions/), que escolhe o idioma pelo pais do IP
+# (o _redirects nao vale nos enderecos que tem Function). O .exe 2.2.1 mostra "vestroautomation.com" no aviso de
+# atualizacao: uma pagina nova na raiz precisa ter um link claro para o Vestro Macro.
+# Os enderecos de antes da pasta (2026-10-23) levam para o novo (301), e de la ao idioma.
 /index.html         /vestromacro/                   301
 /privacidade.html   /vestromacro/privacidade.html   301
 /tutoriais.html     /vestromacro/tutoriais.html     301
 
 # Arquivos do repositorio publico que nao fazem parte do site (o Pages publica a raiz inteira).
-# A pasta docs/ e so do endereco antigo, no GitHub Pages; functions/ e o codigo da Pages Function da API.
+# A pasta docs/ e so do endereco antigo, no GitHub Pages; functions/ e o codigo das Pages Functions.
 /README.md          /vestromacro/                   301
 /CLAUDE.md          /vestromacro/                   301
 /docs/*             /vestromacro/                   301
 /functions/*        /vestromacro/                   301
+/_routes.json       /vestromacro/                   301
+
+# So o idioma (ex.: vestroautomation.com/pt-br): leva ao Vestro Macro nesse idioma (302: a pasta do idioma pode
+# ganhar pagina propria quando houver outros produtos).
+/pt-br              /pt-br/vestromacro/             302
+/pt-br/             /pt-br/vestromacro/             302
+/en                 /en/vestromacro/                302
+/en/                /en/vestromacro/                302
+/es                 /es/vestromacro/                302
+/es/                /es/vestromacro/                302
+/zh-cn              /zh-cn/vestromacro/             302
+/zh-cn/             /zh-cn/vestromacro/             302

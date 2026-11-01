@@ -644,3 +644,29 @@ html { scrollbar-color: rgb(255 255 255 / .16) #030407; }
     .inicio > .contact > .wrap { animation-range: entry 0% entry 70%; }
   }
 }
+
+/* ---- Idioma do site: botao no topo, ao lado do Baixar. E um <details>: abre e fecha sem script; o conta.js so
+   fecha ao clicar fora ou apertar Esc. Os links de cada idioma sao montados por tools/site_idiomas.py. */
+.idioma { position: relative; border: 0; }
+.idioma summary {
+  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px;
+  border: 1px solid var(--line-2); border-radius: 7px; font: 600 .8rem/1 var(--sans); letter-spacing: .03em; color: var(--ink-2);
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.idioma summary::before, .idioma summary::after { content: none; }
+.idioma summary:hover, .idioma[open] summary { color: var(--ink); background: var(--bg-2); border-color: #3b4452; }
+.idioma summary .i { width: 16px; height: 16px; }
+.idioma ul {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; min-width: 172px; margin: 0; padding: 6px; list-style: none;
+  border: 1px solid rgb(255 255 255 / .1); border-radius: 10px; background: rgb(14 16 22 / .94);
+  backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: 0 18px 40px -12px rgb(0 0 0 / .8);
+}
+.idioma a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 10px; border-radius: 6px; color: var(--ink-2); font-size: .9rem; }
+.idioma a:hover { background: var(--bg-2); color: var(--ink); text-decoration: none; }
+.idioma a[aria-current] { color: var(--ink); }
+.idioma a[aria-current]::after { content: "✓"; color: var(--blue); font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) {
+  .idioma[open] ul { animation: idioma-abre .16s var(--ease) both; }
+  @keyframes idioma-abre { from { opacity: 0; transform: translateY(-4px); } }
+}

@@ -1,7 +1,8 @@
 /* conta.js — area do cliente no site: botao Entrar, aba lateral de quem entrou e compra fora do Brasil;
    paginas de entrar, criar conta, confirmar o e-mail e criar senha nova (links do e-mail);
    compra pelo Mercado Pago (pagina comprar: escolher o plano e a renovacao, pagar e a volta do pagamento, com a
-   chave); na aba, cancelar a renovacao automatica.
+   chave) e, fora do Brasil, pela Paddle (em dolar, sempre com renovacao automatica); na aba, cancelar a renovacao
+   automatica.
 
    O unico script do site (CSP script-src 'self'). Chama a API do Worker no mesmo endereco,
    /vestromacro/api/conta (server/cloudflare/src/conta.js); a sessao fica num cookie HttpOnly que
@@ -10,20 +11,34 @@
   "use strict";
 
   const API = "/vestromacro/api/conta";
-  const SITE = "/vestromacro/";
+  // inicio do site no idioma da pagina: /en/vestromacro/ (paginas geradas por tools/site_idiomas.py) ou /vestromacro/
+  const DO_SITE = /^\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?vestromacro\//;
+  const SITE = (DO_SITE.exec(location.pathname) || ["/vestromacro/"])[0];
+  // traducao dos textos deste script: as paginas em outro idioma trazem um <script type="application/json" id="textos">
+  // (so dados, a CSP nao roda), com chave = texto em portugues, como no app. Sem ele (portugues), o texto fica como esta.
+  const TEXTOS = (() => {
+    try { return JSON.parse((document.getElementById("textos") || {}).textContent || "{}"); } catch (e) { return {}; }
+  })();
+  const IDIOMA = document.documentElement.lang || "pt-BR";
   const LARGA = "(min-width: 1000px)";            // a mesma do styles.css: tela larga encolhe o site
   const AVISO = "vestro_conta_aviso";             // mensagem que passa de uma pagina para a outra (sessionStorage)
   const RECOLHIDA = "vestro_aba_recolhida";
   const ANONIMO = "vestro_conta_anonimo";         // quem nao entrou: guarda o "pode comprar" por 5 min,
   const ANONIMO_MS = 5 * 60 * 1000;               // para cada pagina aberta nao gastar um pedido do Worker
   const VOLTAR = "vestro_conta_voltar";           // pagina para voltar depois de entrar (ex.: a compra que pediu login)
-  const NOME_PLANO = { monthly: "/mês", annual: "/ano" };
+  const PADDLE = "vestro_paddle_assinatura";      // id da assinatura que foi para o checkout da Paddle (a volta nao traz)
+  const NOME_PLANO = { monthly: t("/mês"), annual: t("/ano") };
   let pagamentoLigado = false;                    // a API disse que a compra pelo site esta ligada (Mercado Pago)
 
-  const TIPO = { fixed: "Fixa · 1 computador", floating: "Flutuante" };
-  const PLANO = { monthly: "Mensal", annual: "Anual", lifetime: "Vitalícia" };
+  const TIPO = { fixed: t("Fixa · 1 computador"), floating: t("Flutuante") };
+  const PLANO = { monthly: t("Mensal"), annual: t("Anual"), lifetime: t("Vitalícia") };
 
   // ------------------------------------------------------------ ajudantes
+  /** Texto no idioma da pagina; {nome} troca pelo valor. tools/site_idiomas.py acha as chaves pelas chamadas de t. */
+  function t(texto, valores = {}) {
+    return (TEXTOS[texto] || texto).replace(/\{(\w+)\}/g, (m, k) => (k in valores ? String(valores[k]) : m));
+  }
+
   /** Cria um elemento. props: atributos (class, type...) e on* (eventos); filhos: texto ou elementos. */
   function el(tag, props = {}, ...filhos) {
     const e = document.createElement(tag);
@@ -50,9 +65,12 @@
     try { return sessionStorage.getItem(chave); } catch (e) { return null; }
   }
 
-  /** dd/mm/aaaa no horario de Brasilia (sem horario de verao desde 2019) */
+  /** dd/mm/aaaa no horario de Brasilia (sem horario de verao desde 2019); nos outros idiomas, a data como o idioma escreve */
   function dataBr(ts) {
     const d = new Date((Number(ts) - 3 * 3600) * 1000);
+    if (!IDIOMA.startsWith("pt")) {
+      try { return d.toLocaleDateString(IDIOMA, { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" }); } catch (e) { /* abaixo */ }
+    }
     const dois = (n) => String(n).padStart(2, "0");
     return `${dois(d.getUTCDate())}/${dois(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
   }
@@ -61,13 +79,13 @@
     if (usarGuardado) {
       try {
         const g = JSON.parse(lembrar(ANONIMO) || "null");
-        if (g && Date.now() - g.em < ANONIMO_MS) return { ok: true, compra: g.compra, pagamento: g.pagamento, precos: g.precos, conta: null };
+        if (g && Date.now() - g.em < ANONIMO_MS) return { ok: true, compra: g.compra, pagamento: g.pagamento, precos: g.precos, moeda: g.moeda, conta: null };
       } catch (e) { /* guardado estragado: pergunta de novo */ }
     }
     const r = await fetch(API, { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
     if (!r.ok) throw new Error("estado " + r.status);
     const e = await r.json();
-    guardar(ANONIMO, e.conta ? null : JSON.stringify({ em: Date.now(), compra: e.compra, pagamento: e.pagamento, precos: e.precos }));
+    guardar(ANONIMO, e.conta ? null : JSON.stringify({ em: Date.now(), compra: e.compra, pagamento: e.pagamento, precos: e.precos, moeda: e.moeda }));
     return e;
   }
 
@@ -80,10 +98,12 @@
         body: JSON.stringify(dados),
       });
       const j = await r.json().catch(() => ({}));
+      // a mensagem do servidor vem em portugues (ERROS em server/cloudflare/src/conta.js); a traducao fica nos textos
+      if (j && typeof j.mensagem === "string") j.mensagem = t(j.mensagem);
       if (j && typeof j.ok === "boolean") return j;
-      return { ok: false, mensagem: "Algo deu errado. Tente de novo daqui a pouco." };
+      return { ok: false, mensagem: t("Algo deu errado. Tente de novo daqui a pouco.") };
     } catch (e) {
-      return { ok: false, mensagem: "Sem conexão com o servidor. Confira a internet e tente de novo." };
+      return { ok: false, mensagem: t("Sem conexão com o servidor. Confira a internet e tente de novo.") };
     }
   }
 
@@ -112,7 +132,7 @@
       mensagem(caixa, "", "erro");
       const r = await enviar(acao, dados);
       if (botao) botao.disabled = false;
-      if (!r.ok) return mensagem(caixa, r.mensagem || "Não deu certo. Tente de novo.", "erro");
+      if (!r.ok) return mensagem(caixa, r.mensagem || t("Não deu certo. Tente de novo."), "erro");
       await depois(r, form);
     });
   }
@@ -126,11 +146,12 @@
     location.assign(destino());
   }
 
-  /** Para onde ir depois de entrar: a pagina que pediu o login (so do proprio site), ou o inicio. */
+  /** Para onde ir depois de entrar: a pagina que pediu o login (so do proprio site), ou o inicio.
+   *  No idioma desta pagina, mesmo que a pessoa tenha trocado de idioma no meio do caminho. */
   function destino() {
     const v = lembrar(VOLTAR);
     guardar(VOLTAR, null);
-    return v && v.startsWith(SITE) && !v.startsWith("//") ? v : SITE;
+    return v && DO_SITE.test(v) ? v.replace(DO_SITE, SITE) : SITE;
   }
 
   /** Troca o formulario por um aviso de "mandamos o e-mail". */
@@ -144,12 +165,12 @@
     const aviso = lembrar(AVISO);           // ex.: veio do link de troca de e-mail sem ter entrado neste navegador
     if (aviso && acao === "/entrar") mensagem(form.querySelector(".conta-msg"), aviso, "ok");
     ligar(form, acao, {
-      conferir: (d) => (d.senha2 !== undefined && d.senha !== d.senha2 ? "As duas senhas não são iguais." : ""),
+      conferir: (d) => (d.senha2 !== undefined && d.senha !== d.senha2 ? t("As duas senhas não são iguais.") : ""),
       depois: (r) => {
         if (acao === "/entrar") return voltarAoSite("");
-        mostrarEnviado(form, "Confira seu e-mail",
-          `Mandamos um link para ${r.email}. Abra o e-mail e clique em “Confirmar e-mail” para criar a conta.`,
-          "O link vale por 48 horas. Não chegou? Confira a caixa de spam ou tente de novo daqui a alguns minutos.");
+        mostrarEnviado(form, t("Confira seu e-mail"),
+          t("Mandamos um link para {email}. Abra o e-mail e clique em “Confirmar e-mail” para criar a conta.", { email: r.email }),
+          t("O link vale por 48 horas. Não chegou? Confira a caixa de spam ou tente de novo daqui a alguns minutos."));
       },
     });
     // ja entrou? volta para o site
@@ -158,9 +179,9 @@
 
   function paginaEsqueci(form) {
     ligar(form, "/esqueci", {
-      depois: (r) => mostrarEnviado(form, "Confira seu e-mail",
-        `Se ${r.email} tiver conta no site, mandamos para ele um link para criar uma senha nova.`,
-        "O link vale por 1 hora. Não chegou? Confira a caixa de spam ou tente de novo daqui a alguns minutos."),
+      depois: (r) => mostrarEnviado(form, t("Confira seu e-mail"),
+        t("Se {email} tiver conta no site, mandamos para ele um link para criar uma senha nova.", { email: r.email }),
+        t("O link vale por 1 hora. Não chegou? Confira a caixa de spam ou tente de novo daqui a alguns minutos.")),
     });
   }
 
@@ -173,15 +194,16 @@
     return m ? m[1] : "";
   }
 
-  /** Confirmar o e-mail pede um clique: programa que abre os links do e-mail para conferir nao gasta o link. */
+  /** Confirmar o e-mail pede a senha da conta e um clique: programa que abre os links do e-mail para conferir nao gasta
+   *  o link, e quem cadastrou o e-mail de outra pessoa nao deixa a senha dele na conta dela. */
   function paginaConfirmar(form, token) {
     if (!token) return semLink(form);
     ligar(form, "/confirmar", {
       extra: { token },
       depois: (r) => {
-        if (r.tipo !== "email") return voltarAoSite("E-mail confirmado e conta criada. Aqui ficam suas licenças e seus dados.");
+        if (r.tipo !== "email") return voltarAoSite(t("E-mail confirmado e conta criada. Aqui ficam suas licenças e seus dados."));
         // troca de e-mail: a pagina de entrar mostra o aviso (e, se ja entrou neste navegador, leva a aba)
-        guardar(AVISO, `E-mail trocado. Agora você entra com ${r.email}.`);
+        guardar(AVISO, t("E-mail trocado. Agora você entra com {email}.", { email: r.email }));
         location.assign("login");
       },
     });
@@ -191,13 +213,13 @@
     if (!token) return semLink(form);
     ligar(form, "/redefinir", {
       extra: { token },
-      conferir: (d) => (d.nova !== d.nova2 ? "As duas senhas não são iguais." : ""),
-      depois: () => voltarAoSite("Senha nova salva. Os outros navegadores saíram da conta."),
+      conferir: (d) => (d.nova !== d.nova2 ? t("As duas senhas não são iguais.") : ""),
+      depois: () => voltarAoSite(t("Senha nova salva. Os outros navegadores saíram da conta.")),
     });
   }
 
   function semLink(form) {
-    mensagem(form.querySelector(".conta-msg"), "Esse link está incompleto. Abra de novo o link do e-mail, ou peça um novo.", "erro");
+    mensagem(form.querySelector(".conta-msg"), t("Esse link está incompleto. Abra de novo o link do e-mail, ou peça um novo."), "erro");
     for (const c of form.querySelectorAll("input, button")) c.disabled = true;
   }
 
@@ -208,12 +230,15 @@
       for (const at of ["href", "target", "rel"]) a.removeAttribute(at);
       a.setAttribute("aria-disabled", "true");
       a.setAttribute("tabindex", "-1");
-      a.textContent = "Temporariamente indisponível";
+      a.textContent = t("Temporariamente indisponível");
     }
   }
 
   // ------------------------------------------------------------ compra pelo site (Mercado Pago)
   const reais = (centavos) => (Number(centavos) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  /** Valor na moeda da compra: reais (Mercado Pago) ou dolares (Paddle, fora do Brasil). */
+  const dinheiro = (centavos, moeda) => (moeda === "USD"
+    ? (Number(centavos) / 100).toLocaleString("en-US", { style: "currency", currency: "USD" }) : reais(centavos));
 
   /** Os botoes de plano levam a pagina comprar (no lugar do e-mail), e o "Como comprar" troca de lista. */
   function compraPeloSite() {
@@ -230,17 +255,18 @@
   async function copiar(texto, botao) {
     try {
       await navigator.clipboard.writeText(texto);
-      botao.textContent = "Copiada";
+      botao.textContent = t("Copiada");
     } catch (e) {
-      botao.textContent = "Selecione e copie";
+      botao.textContent = t("Selecione e copie");
     }
   }
 
-  /** Endereco do pagamento: so do Mercado Pago (o servidor manda, mas o script confere antes de ir). */
-  function doMercadoPago(endereco) {
+  /** Endereco do pagamento: so do Mercado Pago ou da Paddle (o servidor manda, mas o script confere antes de ir). */
+  function doPagamento(endereco, moeda) {
     try {
       const u = new URL(endereco);
-      return u.protocol === "https:" && /(^|\.)mercadopago\.com(\.br)?$/.test(u.hostname);
+      const host = moeda === "USD" ? /(^|\.)paddle\.(io|com)$/ : /(^|\.)mercadopago\.com(\.br)?$/;
+      return u.protocol === "https:" && host.test(u.hostname);
     } catch (e) {
       return false;
     }
@@ -253,10 +279,18 @@
     // o Mercado Pago pode juntar o external_reference); a volta da compra traz external_reference e payment_id
     // os ids sao hexadecimais; o Mercado Pago gruda "?preapproval_id=..." no fim do endereco de volta da assinatura
     const soId = (v) => ((v || "").match(/^[0-9a-f]{1,40}/) || [""])[0];
-    const assinaturaId = soId(q.get("assinatura"));
+    // volta do checkout da Paddle (comprar?paddle=1): o id da assinatura ficou guardado antes de ir
+    // (depois fica no endereco, para recarregar a pagina, e sai da lembranca: a proxima compra guarda a dela)
+    const daPaddle = q.has("paddle");
+    const assinaturaId = soId(q.get("assinatura") || (daPaddle ? lembrar(PADDLE) : ""));
+    if (daPaddle) guardar(PADDLE, null);
     const compraId = assinaturaId ? "" : soId(q.get("external_reference") || q.get("compra"));
     const pagamento = (q.get("payment_id") || q.get("collection_id") || q.get("pagamento") || "").replace(/\D/g, "").slice(0, 20);
-    if (assinaturaId) history.replaceState(null, "", `${location.pathname}?${new URLSearchParams({ assinatura: assinaturaId })}`);
+    if (assinaturaId) {
+      const limpa = new URLSearchParams({ assinatura: assinaturaId });
+      if (daPaddle) limpa.set("paddle", "1");
+      history.replaceState(null, "", `${location.pathname}?${limpa}`);
+    }
     if (compraId) {
       const limpa = new URLSearchParams({ compra: compraId });
       if (pagamento) limpa.set("pagamento", pagamento);
@@ -271,15 +305,17 @@
       // no topo, o "Entrar" vira o nome de quem entrou (leva para a conta, no inicio do site)
       const entrar = document.querySelector("a.conta-entrar");
       if (entrar) {
-        entrar.textContent = String(e.conta.nome || "").trim().split(/\s+/)[0] || "Minha conta";
+        entrar.textContent = String(e.conta.nome || "").trim().split(/\s+/)[0] || t("Minha conta");
         entrar.setAttribute("href", SITE);
       }
       if (compraId) return voltaDoPagamento(compraId, pagamento);
-      if (assinaturaId) return voltaDaAssinatura(assinaturaId);
+      // voltou da Paddle em outra aba (sem o id guardado): a licenca aparece na conta
+      if (daPaddle && !assinaturaId) return location.replace(SITE);
+      if (assinaturaId) return voltaDaAssinatura(assinaturaId, daPaddle ? "Paddle" : "Mercado Pago");
       if (!e.pagamento) {
         if (!e.compra) {
-          bloco("compra-off-titulo").textContent = "Compra temporariamente indisponível fora do Brasil";
-          bloco("compra-off-texto").textContent = "Você já pode baixar e usar grátis por 30 dias, com tudo liberado.";
+          bloco("compra-off-titulo").textContent = t("Compra temporariamente indisponível fora do Brasil");
+          bloco("compra-off-texto").textContent = t("Você já pode baixar e usar grátis por 30 dias, com tudo liberado.");
         }
         bloco("compra-off").hidden = false;
         return;
@@ -297,19 +333,28 @@
       if (r) r.checked = true;
     };
     form.hidden = false;
+    const moeda = e.moeda === "USD" ? "USD" : "BRL";
+    // fora do Brasil (Paddle): so renovacao automatica, no cartao ou PayPal
+    if (moeda === "USD") {
+      marcar("automatica", "1");
+      document.getElementById("compra-renovacao").hidden = true;
+      document.getElementById("compra-sub").textContent = t("Pague pela Paddle, em dólar. A chave sai na hora: por e-mail e na sua conta.");
+      const fino = form.querySelector(".compra-fine");
+      if (fino) fino.textContent = t("Você vai para o checkout da Paddle e volta para cá depois de pagar. A renovação é automática; cancele quando quiser na sua conta. Não guardamos dados de cartão.");
+    }
     let renovar = null;
     const licId = q.get("licenca");
     if (licId) {
       renovar = e.conta.licencas.find((l) => l.id === licId && l.pode_renovar) || null;
-      document.getElementById("compra-titulo").textContent = "Renovar licença";
+      document.getElementById("compra-titulo").textContent = t("Renovar licença");
       if (!renovar) {
-        mensagem(caixa, "Essa licença não pode ser renovada pelo site. Fale com o suporte: contato@vestroautomation.com.", "erro");
+        mensagem(caixa, t("Essa licença não pode ser renovada pelo site. Fale com o suporte: contato@vestroautomation.com."), "erro");
         botao.disabled = true;
         return;
       }
-      const vence = renovar.situacao === "vencida" ? `venceu em ${dataBr(renovar.vence)}` : `vale até ${dataBr(renovar.vence)}`;
+      const vence = renovar.situacao === "vencida" ? t("venceu em {data}", { data: dataBr(renovar.vence) }) : t("vale até {data}", { data: dataBr(renovar.vence) });
       document.getElementById("compra-sub").textContent =
-        `Chave terminada em ${renovar.final}, ${vence}. O período novo começa no vencimento (ou hoje, se já venceu); a chave continua a mesma.`;
+        t("Chave terminada em {final}, {vence}. O período novo começa no vencimento (ou hoje, se já venceu); a chave continua a mesma.", { final: renovar.final, vence });
       marcar("tipo", renovar.tipo);
       marcar("plano", renovar.plano === "annual" ? "annual" : "monthly");
       document.getElementById("compra-tipo").disabled = true;
@@ -328,28 +373,32 @@
       const ok = Number.isInteger(n) && n >= 1 && n <= 50;
       for (const p of form.querySelectorAll(".compra-preco")) {
         const v = e.precos[tipo][p.dataset.plano];
-        p.textContent = `${reais(v)}${NOME_PLANO[p.dataset.plano]}${tipo === "floating" ? " por vaga" : ""}`;
+        p.textContent = `${dinheiro(v, moeda)}${NOME_PLANO[p.dataset.plano]}${tipo === "floating" ? t(" por vaga") : ""}`;
       }
-      document.getElementById("compra-total").textContent = ok ? reais(e.precos[tipo][escolhido("plano")] * n) : "—";
+      document.getElementById("compra-total").textContent = ok ? dinheiro(e.precos[tipo][escolhido("plano")] * n, moeda) : "—";
       const mensal = escolhido("plano") === "monthly";
       document.getElementById("compra-periodo").textContent = escolhido("automatica") === "1"
-        ? (mensal ? "por mês, no cartão, até você cancelar" : "por ano, no cartão, até você cancelar")
-        : (mensal ? "por 1 mês" : "por 1 ano");
-      botao.textContent = escolhido("automatica") === "1" ? "Assinar com Mercado Pago" : "Pagar com Mercado Pago";
+        ? (mensal ? t("por mês, no cartão, até você cancelar") : t("por ano, no cartão, até você cancelar"))
+        : (mensal ? t("por 1 mês") : t("por 1 ano"));
+      botao.textContent = moeda === "USD" ? t("Assinar com a Paddle")
+        : escolhido("automatica") === "1" ? t("Assinar com Mercado Pago") : t("Pagar com Mercado Pago");
     }
     form.addEventListener("input", atualizar);
     atualizar();
     form.addEventListener("submit", async (ev) => {
       ev.preventDefault();
       const n = nVagas();
-      if (!Number.isInteger(n) || n < 1 || n > 50) return mensagem(caixa, "Escolha de 1 a 50 vagas. Mais que isso: fale com a gente em contato@vestroautomation.com.", "erro");
+      if (!Number.isInteger(n) || n < 1 || n > 50) return mensagem(caixa, t("Escolha de 1 a 50 vagas. Mais que isso: fale com a gente em contato@vestroautomation.com."), "erro");
       botao.disabled = true;
       mensagem(caixa, "", "erro");
       const r = await enviar("/comprar", { tipo: escolhido("tipo"), plano: escolhido("plano"), vagas: String(n),
         licenca: renovar ? renovar.id : "", automatica: escolhido("automatica") === "1" ? "1" : "0" });
-      if (r.ok && doMercadoPago(r.url)) return location.assign(r.url);
+      if (r.ok && doPagamento(r.url, moeda)) {
+        if (r.assinatura) guardar(PADDLE, r.assinatura);
+        return location.assign(r.url);
+      }
       botao.disabled = false;
-      mensagem(caixa, r.ok ? "Algo deu errado. Tente de novo daqui a pouco." : (r.mensagem || "Não deu certo. Tente de novo."), "erro");
+      mensagem(caixa, r.ok ? t("Algo deu errado. Tente de novo daqui a pouco.") : (r.mensagem || t("Não deu certo. Tente de novo.")), "erro");
     });
   }
 
@@ -359,106 +408,112 @@
     const titulo = document.getElementById("compra-titulo");
     const sub = document.getElementById("compra-sub");
     caixa.hidden = false;
-    titulo.textContent = "Conferindo o pagamento…";
+    titulo.textContent = t("Conferindo o pagamento…");
     sub.textContent = "";
     let tentativas = 0;
     const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes);
-    const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, "Ir para minha conta"));
+    const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, t("Ir para minha conta")));
     async function conferir() {
       const r = await enviar("/compra", { compra: compraId, pagamento });
       if (!r.ok) {
-        titulo.textContent = "Não deu para conferir agora";
-        return mostrar("Tente de novo daqui a pouco", el("p", {}, r.mensagem || ""),
-          el("p", { class: "compra-acoes" }, el("button", { class: "btn btn-ghost", type: "button", onclick: conferir }, "Conferir de novo")));
+        titulo.textContent = t("Não deu para conferir agora");
+        return mostrar(t("Tente de novo daqui a pouco"), el("p", {}, r.mensagem || ""),
+          el("p", { class: "compra-acoes" }, el("button", { class: "btn btn-ghost", type: "button", onclick: conferir }, t("Conferir de novo"))));
       }
       if (r.situacao === "aprovada" && r.renovacao) {
-        titulo.textContent = "Licença renovada";
-        return mostrar("Pagamento aprovado",
-          el("p", {}, `A licença com a chave terminada em ${r.final} agora vale até ${dataBr(r.vence)}. A chave continua a mesma: não precisa fazer nada no Vestro Macro.`),
-          el("p", {}, "Mandamos a confirmação para o seu e-mail."), irParaConta());
+        titulo.textContent = t("Licença renovada");
+        return mostrar(t("Pagamento aprovado"),
+          el("p", {}, t("A licença com a chave terminada em {final} agora vale até {data}. A chave continua a mesma: não precisa fazer nada no Vestro Macro.", { final: r.final, data: dataBr(r.vence) })),
+          el("p", {}, t("Mandamos a confirmação para o seu e-mail.")), irParaConta());
       }
       if (r.situacao === "aprovada") {
-        titulo.textContent = "Pagamento aprovado";
-        const copiarBotao = el("button", { class: "btn btn-ghost", type: "button", onclick: () => copiar(r.chave, copiarBotao) }, "Copiar");
-        return mostrar("Sua chave",
+        titulo.textContent = t("Pagamento aprovado");
+        const copiarBotao = el("button", { class: "btn btn-ghost", type: "button", onclick: () => copiar(r.chave, copiarBotao) }, t("Copiar"));
+        return mostrar(t("Sua chave"),
           r.chave ? el("div", { class: "compra-chave" }, el("code", {}, r.chave), copiarBotao) : null,
-          el("p", {}, "No Vestro Macro, digite essa chave onde ele pede a licença."),
-          el("p", {}, `Também mandamos a chave para o seu e-mail. Ela fica na sua conta, para copiar quando precisar${r.vence ? `, e vale até ${dataBr(r.vence)}` : ""}.`),
+          el("p", {}, t("No Vestro Macro, digite essa chave onde ele pede a licença.")),
+          el("p", {}, (r.vence ? t("Também mandamos a chave para o seu e-mail. Ela fica na sua conta, para copiar quando precisar, e vale até {data}.", { data: dataBr(r.vence) })
+            : t("Também mandamos a chave para o seu e-mail. Ela fica na sua conta, para copiar quando precisar."))),
           irParaConta());
       }
       if (r.situacao === "pendente") {
-        titulo.textContent = "Pagamento em análise";
+        titulo.textContent = t("Pagamento em análise");
         const fim = ++tentativas >= 24;
         if (!fim) setTimeout(conferir, 5000);
-        return mostrar("Aguardando o Mercado Pago",
-          el("p", {}, "Assim que o pagamento for aprovado, a chave aparece aqui, na sua conta e no seu e-mail. Pix costuma levar alguns segundos."),
-          fim ? el("p", {}, "Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.") : null);
+        return mostrar(t("Aguardando o Mercado Pago"),
+          el("p", {}, t("Assim que o pagamento for aprovado, a chave aparece aqui, na sua conta e no seu e-mail. Pix costuma levar alguns segundos.")),
+          fim ? el("p", {}, t("Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.")) : null);
       }
       if (r.situacao === "recusada") {
-        titulo.textContent = "Pagamento não aprovado";
-        return mostrar("O Mercado Pago não aprovou o pagamento",
-          el("p", {}, "Tente de novo, se quiser com outra forma de pagamento."),
-          el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, "Tentar de novo")));
+        titulo.textContent = t("Pagamento não aprovado");
+        return mostrar(t("O Mercado Pago não aprovou o pagamento"),
+          el("p", {}, t("Tente de novo, se quiser com outra forma de pagamento.")),
+          el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, t("Tentar de novo"))));
       }
       if (r.situacao === "devolvida") {
-        titulo.textContent = "Pagamento devolvido";
-        return mostrar("Esse pagamento foi devolvido", el("p", {}, r.renovacao
-          ? "O período dessa renovação saiu da licença. Dúvidas: contato@vestroautomation.com."
-          : "A licença dessa compra foi bloqueada. Dúvidas: contato@vestroautomation.com."), irParaConta());
+        titulo.textContent = t("Pagamento devolvido");
+        return mostrar(t("Esse pagamento foi devolvido"), el("p", {}, r.renovacao
+          ? t("O período dessa renovação saiu da licença. Dúvidas: contato@vestroautomation.com.")
+          : t("A licença dessa compra foi bloqueada. Dúvidas: contato@vestroautomation.com.")), irParaConta());
       }
-      titulo.textContent = "Recebemos o pagamento";
-      return mostrar("Precisamos conferir uma coisa",
-        el("p", {}, "O valor pago não bateu com o pedido, então a chave não saiu sozinha. Fale com o suporte em contato@vestroautomation.com: resolvemos rápido."));
+      titulo.textContent = t("Recebemos o pagamento");
+      return mostrar(t("Precisamos conferir uma coisa"),
+        el("p", {}, t("O valor pago não bateu com o pedido, então a chave não saiu sozinha. Fale com o suporte em contato@vestroautomation.com: resolvemos rápido.")));
     }
     conferir();
   }
 
-  /** Volta do Mercado Pago depois de assinar: espera o cartao ser autorizado e a primeira cobranca, e mostra a chave. */
-  function voltaDaAssinatura(assinaturaId) {
+  /** Volta do Mercado Pago (ou da Paddle) depois de assinar: espera a primeira cobranca e mostra a chave. */
+  function voltaDaAssinatura(assinaturaId, provedor) {
     const caixa = document.getElementById("compra-volta");
     const titulo = document.getElementById("compra-titulo");
     document.getElementById("compra-sub").textContent = "";
     caixa.hidden = false;
-    titulo.textContent = "Conferindo a assinatura…";
+    titulo.textContent = t("Conferindo a assinatura…");
     let tentativas = 0;
     const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes);
-    const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, "Ir para minha conta"));
-    const proxima = (r) => (r.proxima ? ` A próxima cobrança é em ${dataBr(r.proxima)}.` : "");
-    const cancelarNaConta = "Para cancelar a renovação automática, use “Cancelar renovação automática” na sua conta.";
+    const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, t("Ir para minha conta")));
+    const proxima = (r) => (r.proxima ? " " + t("A próxima cobrança é em {data}.", { data: dataBr(r.proxima) }) : "");
+    const cancelarNaConta = t("Para cancelar a renovação automática, use “Cancelar renovação automática” na sua conta.");
     async function conferir() {
       const r = await enviar("/assinatura", { assinatura: assinaturaId });
       if (!r.ok) {
-        titulo.textContent = "Não deu para conferir agora";
-        return mostrar("Tente de novo daqui a pouco", el("p", {}, r.mensagem || ""),
-          el("p", { class: "compra-acoes" }, el("button", { class: "btn btn-ghost", type: "button", onclick: conferir }, "Conferir de novo")));
+        titulo.textContent = t("Não deu para conferir agora");
+        return mostrar(t("Tente de novo daqui a pouco"), el("p", {}, r.mensagem || ""),
+          el("p", { class: "compra-acoes" }, el("button", { class: "btn btn-ghost", type: "button", onclick: conferir }, t("Conferir de novo"))));
       }
       if (r.paga && r.renovacao) {
-        titulo.textContent = "Renovação automática ligada";
-        return mostrar("Pagamento aprovado",
-          el("p", {}, `A licença com a chave terminada em ${r.final} agora vale até ${dataBr(r.vence)}. A chave continua a mesma.${proxima(r)}`),
+        titulo.textContent = t("Renovação automática ligada");
+        return mostrar(t("Pagamento aprovado"),
+          el("p", {}, t("A licença com a chave terminada em {final} agora vale até {data}. A chave continua a mesma.", { final: r.final, data: dataBr(r.vence) }) + proxima(r)),
           el("p", {}, cancelarNaConta), irParaConta());
       }
       if (r.paga) {
-        titulo.textContent = "Renovação automática ligada";
-        const copiarBotao = el("button", { class: "btn btn-ghost", type: "button", onclick: () => copiar(r.chave, copiarBotao) }, "Copiar");
-        return mostrar("Sua chave",
+        titulo.textContent = t("Renovação automática ligada");
+        const copiarBotao = el("button", { class: "btn btn-ghost", type: "button", onclick: () => copiar(r.chave, copiarBotao) }, t("Copiar"));
+        return mostrar(t("Sua chave"),
           r.chave ? el("div", { class: "compra-chave" }, el("code", {}, r.chave), copiarBotao) : null,
-          el("p", {}, "No Vestro Macro, digite essa chave onde ele pede a licença."),
-          el("p", {}, `Também mandamos a chave para o seu e-mail. Ela fica na sua conta e vale até ${dataBr(r.vence)}.${proxima(r)}`),
+          el("p", {}, t("No Vestro Macro, digite essa chave onde ele pede a licença.")),
+          el("p", {}, t("Também mandamos a chave para o seu e-mail. Ela fica na sua conta e vale até {data}.", { data: dataBr(r.vence) }) + proxima(r)),
           el("p", {}, cancelarNaConta), irParaConta());
       }
       if (r.situacao === "pendente" || r.situacao === "ativa") {
-        titulo.textContent = r.situacao === "ativa" ? "Cartão autorizado" : "Aguardando o Mercado Pago";
+        const paddle = provedor === "Paddle";
+        titulo.textContent = r.situacao === "ativa" ? t("Cartão autorizado") : (paddle ? t("Aguardando a Paddle") : t("Aguardando o Mercado Pago"));
         const fim = ++tentativas >= 24;
         if (!fim) setTimeout(conferir, 5000);
-        return mostrar("Aguardando a primeira cobrança",
-          el("p", {}, "Assim que o Mercado Pago aprovar a cobrança no cartão, a chave aparece aqui, na sua conta e no seu e-mail."),
-          fim ? el("p", {}, "Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.") : null);
+        return mostrar(t("Aguardando a primeira cobrança"),
+          el("p", {}, paddle ? t("Assim que a Paddle aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.")
+            : t("Assim que o Mercado Pago aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.")),
+          fim ? el("p", {}, t("Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.")) : null);
       }
-      titulo.textContent = "Assinatura não ativada";
-      return mostrar(r.situacao === "pausada" ? "A assinatura está pausada no Mercado Pago" : "A renovação automática foi cancelada",
-        el("p", {}, "Nada foi cobrado por esta página. Se quiser, tente de novo ou pague uma vez com Pix."),
-        el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, "Tentar de novo")));
+      titulo.textContent = t("Assinatura não ativada");
+      return mostrar(r.situacao === "pausada"
+          ? (provedor === "Paddle" ? t("A assinatura está pausada na Paddle") : t("A assinatura está pausada no Mercado Pago"))
+          : t("A renovação automática foi cancelada"),
+        el("p", {}, provedor === "Paddle" ? t("Nada foi cobrado por esta página. Se quiser, tente de novo.")
+          : t("Nada foi cobrado por esta página. Se quiser, tente de novo ou pague uma vez com Pix.")),
+        el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, t("Tentar de novo"))));
     }
     conferir();
   }
@@ -473,28 +528,28 @@
 
   // as mesmas opcoes de MOTIVOS_CANCELAMENTO (server/cloudflare/src/compra.js); "outro" pede o texto
   const MOTIVOS = [
-    ["caro", "Está caro"],
-    ["nao_uso", "Não estou usando o Vestro Macro"],
-    ["pagar_avulso", "Prefiro pagar quando precisar, sem cobrança automática"],
-    ["faltou_recurso", "Faltou um recurso de que eu preciso"],
-    ["problema", "Tive problemas com o programa"],
-    ["outra_ferramenta", "Vou usar outra ferramenta"],
-    ["outro", "Outro motivo"],
+    ["caro", t("Está caro")],
+    ["nao_uso", t("Não estou usando o Vestro Macro")],
+    ["pagar_avulso", t("Prefiro pagar quando precisar, sem cobrança automática")],
+    ["faltou_recurso", t("Faltou um recurso de que eu preciso")],
+    ["problema", t("Tive problemas com o programa")],
+    ["outra_ferramenta", t("Vou usar outra ferramenta")],
+    ["outro", t("Outro motivo")],
   ];
 
   /** Janela que pergunta o motivo antes de cancelar a renovacao automatica. feito() roda quando cancelou. */
   function perguntarMotivo(assinatura, feito) {
     const opcoes = MOTIVOS.map(([valor, texto]) =>
       el("label", {}, el("input", { type: "radio", name: "motivo", value: valor, required: true }), el("span", {}, el("strong", {}, texto))));
-    const nota = el("textarea", { name: "nota", rows: 3, maxlength: 500, placeholder: "Conte para a gente o motivo" });
-    const campoNota = el("label", { class: "cancelar-nota", hidden: true }, el("span", {}, "Qual é o motivo?"), nota);
+    const nota = el("textarea", { name: "nota", rows: 3, maxlength: 500, placeholder: t("Conte para a gente o motivo") });
+    const campoNota = el("label", { class: "cancelar-nota", hidden: true }, el("span", {}, t("Qual é o motivo?")), nota);
     const msg = el("p", { class: "conta-msg" });
-    const confirmar = el("button", { type: "submit", class: "btn btn-primary" }, "Cancelar a renovação");
-    const voltar = el("button", { type: "button", class: "btn btn-ghost", onclick: () => janela.close() }, "Voltar");
+    const confirmar = el("button", { type: "submit", class: "btn btn-primary" }, t("Cancelar a renovação"));
+    const voltar = el("button", { type: "button", class: "btn btn-ghost", onclick: () => janela.close() }, t("Voltar"));
     const form = el("form", { method: "dialog" },
-      el("h2", { id: "cancelar-titulo" }, "Por que você quer cancelar?"),
-      el("p", {}, "A licença continua valendo até o vencimento. Depois disso, não haverá mais cobranças."),
-      el("fieldset", { class: "escolha escolha-lista" }, el("legend", {}, "Motivo"), opcoes),
+      el("h2", { id: "cancelar-titulo" }, t("Por que você quer cancelar?")),
+      el("p", {}, t("A licença continua valendo até o vencimento. Depois disso, não haverá mais cobranças.")),
+      el("fieldset", { class: "escolha escolha-lista" }, el("legend", {}, t("Motivo")), opcoes),
       campoNota, msg,
       el("div", { class: "cancelar-botoes" }, voltar, confirmar));
     const janela = el("dialog", { class: "cancelar-janela", "aria-labelledby": "cancelar-titulo" }, form);
@@ -507,12 +562,12 @@
       ev.preventDefault();
       const motivo = form.elements.motivo.value;
       const texto = nota.value.trim();
-      if (!motivo) return mensagem(msg, "Escolha um motivo.", "erro");
-      if (motivo === "outro" && !texto) { mensagem(msg, "Escreva o motivo.", "erro"); return nota.focus(); }
+      if (!motivo) return mensagem(msg, t("Escolha um motivo."), "erro");
+      if (motivo === "outro" && !texto) { mensagem(msg, t("Escreva o motivo."), "erro"); return nota.focus(); }
       confirmar.disabled = voltar.disabled = true;
       const r = await enviar("/cancelar", { assinatura, motivo, nota: motivo === "outro" ? texto : "" });
       confirmar.disabled = voltar.disabled = false;
-      if (!r.ok) return mensagem(msg, r.mensagem || "Não deu certo. Tente de novo.", "erro");
+      if (!r.ok) return mensagem(msg, r.mensagem || t("Não deu certo. Tente de novo."), "erro");
       janela.close();
       feito();
     });
@@ -531,14 +586,14 @@
         botao.disabled = false;
         if (!r.ok) {
           mostra.className = "conta-msg erro";
-          mostra.textContent = r.mensagem || "Não deu certo. Tente de novo.";
+          mostra.textContent = r.mensagem || t("Não deu certo. Tente de novo.");
         } else {
           mostra.className = "aba-chave-inteira";
           mostra.textContent = r.chave;               // a mostra tambem, se o navegador nao deixar copiar
           await copiar(r.chave, botao);
         }
         acoes.before(mostra);
-      } }, "Copiar a chave");
+      } }, t("Copiar a chave"));
       acoes.append(botao);
     }
     // renovacao automatica ligada: mostra a proxima cobranca e o botao de cancelar (abre a janela do motivo); sem ela, "Renovar"
@@ -546,28 +601,29 @@
     if (l.assinatura) {
       const a = l.assinatura;
       auto = el("p", { class: "aba-auto" }, a.situacao === "pausada"
-        ? "Renovação automática pausada no Mercado Pago"
-        : `Renovação automática ligada${a.proxima ? ` · próxima cobrança em ${dataBr(a.proxima)}` : ""}`);
+        ? (a.provedor === "Paddle" ? t("Renovação automática pausada na Paddle") : t("Renovação automática pausada no Mercado Pago"))
+        : (a.proxima ? t("Renovação automática ligada · próxima cobrança em {data}", { data: dataBr(a.proxima) }) : t("Renovação automática ligada")));
       const cancelar = el("button", { type: "button", onclick: () => perguntarMotivo(a.id, () => {
-        auto.textContent = `Renovação automática cancelada: a licença vale até ${l.vence ? dataBr(l.vence) : "o vencimento"} e não haverá mais cobranças.`;
+        auto.textContent = (l.vence ? t("Renovação automática cancelada: a licença vale até {data} e não haverá mais cobranças.", { data: dataBr(l.vence) })
+          : t("Renovação automática cancelada: a licença vale até o vencimento e não haverá mais cobranças."));
         cancelar.remove();
-        if (pagamentoLigado && l.pode_renovar) acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, "Renovar"));
-      }) }, "Cancelar renovação automática");
+        if (pagamentoLigado && l.pode_renovar) acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, t("Renovar")));
+      }) }, t("Cancelar renovação automática"));
       acoes.append(cancelar);
     } else if (pagamentoLigado && l.pode_renovar) {
-      acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, "Renovar"));
+      acoes.append(el("a", { class: "btn", href: `${SITE}comprar?${new URLSearchParams({ licenca: l.id })}` }, t("Renovar")));
     }
     let situacao, aviso = false;
-    if (l.situacao === "bloqueada") { situacao = "Bloqueada"; aviso = true; }
-    else if (l.situacao === "vencida") { situacao = `Vencida em ${dataBr(l.vence)}`; aviso = true; }
-    else situacao = l.vence === null ? "Ativa, sem vencimento" : `Ativa até ${dataBr(l.vence)}`;
-    const tipo = l.tipo === "floating" ? `Flutuante · ${l.vagas} ${l.vagas === 1 ? "vaga" : "vagas"}` : TIPO.fixed;
+    if (l.situacao === "bloqueada") { situacao = t("Bloqueada"); aviso = true; }
+    else if (l.situacao === "vencida") { situacao = t("Vencida em {data}", { data: dataBr(l.vence) }); aviso = true; }
+    else situacao = l.vence === null ? t("Ativa, sem vencimento") : t("Ativa até {data}", { data: dataBr(l.vence) });
+    const tipo = l.tipo === "floating" ? (l.vagas === 1 ? t("Flutuante · {n} vaga", { n: l.vagas }) : t("Flutuante · {n} vagas", { n: l.vagas })) : TIPO.fixed;
     const onde = l.tipo === "floating"
-      ? `${l.em_uso} de ${l.vagas} em uso agora`
-      : (l.computador ? `No computador ${l.computador}` : "Ainda não ativada em nenhum computador");
+      ? t("{uso} de {vagas} em uso agora", { uso: l.em_uso, vagas: l.vagas })
+      : (l.computador ? t("No computador {nome}", { nome: l.computador }) : t("Ainda não ativada em nenhum computador"));
     const item = el("li", { class: "aba-lic" },
       el("div", { class: "aba-lic-topo" }, el("h3", {}, tipo), el("span", { class: aviso ? "aba-status aviso" : "aba-status" }, situacao)),
-      el("p", { class: "aba-chave" }, `${PLANO[l.plano] || l.plano} · chave terminada em ${l.final}`),
+      el("p", { class: "aba-chave" }, t("{plano} · chave terminada em {final}", { plano: PLANO[l.plano] || l.plano, final: l.final })),
       el("p", {}, onde),
       l.motivo ? el("p", { class: "aba-auto aviso" }, l.motivo) : null,
       auto,
@@ -596,31 +652,31 @@
 
     const lista = conta.licencas.length
       ? el("ul", { class: "aba-lista" }, conta.licencas.map(licencaItem))
-      : el("p", { class: "aba-vazio" }, "Nenhuma licença na sua conta ainda. Recebeu a chave de outro jeito? Adicione aqui embaixo.");
+      : el("p", { class: "aba-vazio" }, t("Nenhuma licença na sua conta ainda. Recebeu a chave de outro jeito? Adicione aqui embaixo."));
 
     const fLicenca = el("form", { class: "aba-form", method: "post", novalidate: true },
-      campo("Chave", { name: "chave", required: true, maxlength: 64, placeholder: "VSTR-XXXXX-XXXXX-XXXXX-XXXXX", autocomplete: "off", spellcheck: "false" }),
-      el("button", { type: "submit" }, "Adicionar"));
-    ligar(fLicenca, "/licenca", { depois: recarregar("Licença adicionada à sua conta.") });
+      campo(t("Chave"), { name: "chave", required: true, maxlength: 64, placeholder: "VSTR-XXXXX-XXXXX-XXXXX-XXXXX", autocomplete: "off", spellcheck: "false" }),
+      el("button", { type: "submit" }, t("Adicionar")));
+    ligar(fLicenca, "/licenca", { depois: recarregar(t("Licença adicionada à sua conta.")) });
 
     const fDados = el("form", { class: "aba-form", method: "post", novalidate: true },
-      campo("Nome", { name: "nome", required: true, maxlength: 80, autocomplete: "name", value: conta.nome }),
-      campo("E-mail", { type: "email", name: "email", required: true, maxlength: 254, autocomplete: "email", value: conta.email }),
-      campo("Telefone de contato", { type: "tel", name: "telefone", maxlength: 30, autocomplete: "tel", value: conta.telefone, placeholder: "(47) 99999-9999" }),
-      campo("Senha atual", { type: "password", name: "senha", maxlength: 200, autocomplete: "current-password" }, "só para trocar o e-mail"),
-      el("button", { class: "aba-principal", type: "submit" }, "Salvar"));
+      campo(t("Nome"), { name: "nome", required: true, maxlength: 80, autocomplete: "name", value: conta.nome }),
+      campo(t("E-mail"), { type: "email", name: "email", required: true, maxlength: 254, autocomplete: "email", value: conta.email }),
+      campo(t("Telefone de contato"), { type: "tel", name: "telefone", maxlength: 30, autocomplete: "tel", value: conta.telefone, placeholder: "(47) 99999-9999" }),
+      campo(t("Senha atual"), { type: "password", name: "senha", maxlength: 200, autocomplete: "current-password" }, t("só para trocar o e-mail")),
+      el("button", { class: "aba-principal", type: "submit" }, t("Salvar")));
     ligar(fDados, "/dados", { depois: (r) => recarregar(r.email_pendente
-      ? `Dados salvos. Mandamos um link para ${r.email_pendente}: o e-mail da conta muda quando você abrir esse link.`
-      : "Dados salvos.")() });
+      ? t("Dados salvos. Mandamos um link para {email}: o e-mail da conta muda quando você abrir esse link.", { email: r.email_pendente })
+      : t("Dados salvos."))() });
 
     const fSenha = el("form", { class: "aba-form", method: "post", novalidate: true },
-      campo("Senha atual", { type: "password", name: "senha", required: true, maxlength: 200, autocomplete: "current-password" }),
-      campo("Senha nova", { type: "password", name: "nova", required: true, minlength: 8, maxlength: 200, autocomplete: "new-password" }),
-      campo("Repita a senha nova", { type: "password", name: "nova2", required: true, minlength: 8, maxlength: 200, autocomplete: "new-password" }),
-      el("button", { type: "submit" }, "Trocar a senha"));
+      campo(t("Senha atual"), { type: "password", name: "senha", required: true, maxlength: 200, autocomplete: "current-password" }),
+      campo(t("Senha nova"), { type: "password", name: "nova", required: true, minlength: 8, maxlength: 200, autocomplete: "new-password" }),
+      campo(t("Repita a senha nova"), { type: "password", name: "nova2", required: true, minlength: 8, maxlength: 200, autocomplete: "new-password" }),
+      el("button", { type: "submit" }, t("Trocar a senha")));
     ligar(fSenha, "/senha", {
-      conferir: (d) => (d.nova !== d.nova2 ? "As duas senhas novas não são iguais." : ""),
-      depois: recarregar("Senha trocada. Os outros navegadores saíram da conta."),
+      conferir: (d) => (d.nova !== d.nova2 ? t("As duas senhas novas não são iguais.") : ""),
+      depois: recarregar(t("Senha trocada. Os outros navegadores saíram da conta.")),
     });
 
     const sair = el("button", { class: "aba-sair", type: "button", onclick: async () => {
@@ -628,28 +684,28 @@
       guardar(RECOLHIDA, null);
       guardar(ANONIMO, null);
       location.assign(SITE);
-    } }, "Sair da conta");
+    } }, t("Sair da conta"));
 
     const msg = el("p", { class: "conta-msg ok" });
     if (aviso) mensagem(msg, aviso, "ok");
 
     const iniciais = String(conta.nome || "").trim().split(/\s+/).slice(0, 2).map((p) => Array.from(p)[0] || "").join("").toUpperCase();
     // cabeca (titulo, X e quem entrou) fica parada; so o corpo rola, passando por baixo dela
-    const aba = el("aside", { class: "aba-conta", id: "minha-conta", "aria-label": "Minha conta" },
+    const aba = el("aside", { class: "aba-conta", id: "minha-conta", "aria-label": t("Minha conta") },
       el("div", { class: "aba-cabeca" },
       el("div", { class: "aba-topo" },
-        el("span", {}, "Minha conta"),
-        el("button", { class: "aba-fechar", type: "button", title: "Recolher a aba", "aria-label": "Recolher a aba",
+        el("span", {}, t("Minha conta")),
+        el("button", { class: "aba-fechar", type: "button", title: t("Recolher a aba"), "aria-label": t("Recolher a aba"),
           onclick: () => abrirAba(false) }, "×")),
       el("div", { class: "aba-perfil" },
         el("span", { class: "aba-avatar", "aria-hidden": "true" }, iniciais || "?"),
         el("div", {}, el("strong", {}, conta.nome), el("small", {}, conta.email)))),
       el("div", { class: "aba-corpo" },
       msg,
-      el("h2", {}, "Licenças"), lista,
-      el("details", { class: "aba-mais" }, el("summary", {}, "Adicionar uma licença pela chave"), fLicenca),
-      el("h2", {}, "Meus dados"), fDados,
-      el("details", { class: "aba-mais" }, el("summary", {}, "Trocar a senha"), fSenha),
+      el("h2", {}, t("Licenças")), lista,
+      el("details", { class: "aba-mais" }, el("summary", {}, t("Adicionar uma licença pela chave")), fLicenca),
+      el("h2", {}, t("Meus dados")), fDados,
+      el("details", { class: "aba-mais" }, el("summary", {}, t("Trocar a senha")), fSenha),
       sair));
 
     const antiga = document.getElementById("minha-conta");
@@ -657,7 +713,7 @@
     else document.body.prepend(aba);
 
     // topo: "Entrar" vira o nome de quem entrou, e abre/fecha a aba
-    const primeiro = String(conta.nome || "").trim().split(/\s+/)[0] || "Minha conta";
+    const primeiro = String(conta.nome || "").trim().split(/\s+/)[0] || t("Minha conta");
     const botao = el("button", { class: "conta-botao", type: "button", "aria-controls": "minha-conta",
       onclick: () => abrirAba(!document.body.classList.contains("aba-aberta")) }, el("span", {}, primeiro));
     const atual = document.querySelector("a.conta-entrar, button.conta-botao");
@@ -669,8 +725,20 @@
     abrirAba(aberta);
   }
 
+  // ------------------------------------------------------------ botao de idioma (topo)
+  /** O <details class="idioma"> abre sozinho; aqui so fecha ao clicar fora ou com Esc. */
+  function menuIdioma() {
+    const menu = document.querySelector("details.idioma");
+    if (!menu) return;
+    document.addEventListener("click", (ev) => { if (menu.open && !menu.contains(ev.target)) menu.open = false; });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && menu.open) { menu.open = false; menu.querySelector("summary").focus(); }
+    });
+  }
+
   // ------------------------------------------------------------ inicio
   function iniciar() {
+    menuIdioma();
     const form = (id) => document.getElementById(id);
     if (form("form-entrar")) return paginaDeEntrada(form("form-entrar"), "/entrar");
     if (form("form-criar")) return paginaDeEntrada(form("form-criar"), "/criar");
