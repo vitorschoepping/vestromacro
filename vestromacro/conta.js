@@ -1,7 +1,7 @@
 /* conta.js — area do cliente no site: botao Entrar, aba lateral de quem entrou e compra fora do Brasil;
    paginas de entrar, criar conta, confirmar o e-mail e criar senha nova (links do e-mail);
    compra pelo Mercado Pago (pagina comprar: escolher o plano e a renovacao, pagar e a volta do pagamento, com a
-   chave) e, fora do Brasil, pela Paddle (em dolar, sempre com renovacao automatica); na aba, cancelar a renovacao
+   chave) e, fora do Brasil, pela Lemon Squeezy (em dolar, sempre com renovacao automatica); na aba, cancelar a renovacao
    automatica.
 
    O unico script do site (CSP script-src 'self'). Chama a API do Worker no mesmo endereco,
@@ -26,7 +26,7 @@
   const ANONIMO = "vestro_conta_anonimo";         // quem nao entrou: guarda o "pode comprar" por 5 min,
   const ANONIMO_MS = 5 * 60 * 1000;               // para cada pagina aberta nao gastar um pedido do Worker
   const VOLTAR = "vestro_conta_voltar";           // pagina para voltar depois de entrar (ex.: a compra que pediu login)
-  const PADDLE = "vestro_paddle_assinatura";      // id da assinatura que foi para o checkout da Paddle (a volta nao traz)
+  const EXTERNO = "vestro_externo_assinatura";    // id da assinatura que foi para o checkout de fora do Brasil (a volta nao traz)
   const NOME_PLANO = { monthly: t("/mês"), annual: t("/ano") };
   let pagamentoLigado = false;                    // a API disse que a compra pelo site esta ligada (Mercado Pago)
 
@@ -236,7 +236,7 @@
 
   // ------------------------------------------------------------ compra pelo site (Mercado Pago)
   const reais = (centavos) => (Number(centavos) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  /** Valor na moeda da compra: reais (Mercado Pago) ou dolares (Paddle, fora do Brasil). */
+  /** Valor na moeda da compra: reais (Mercado Pago) ou dolares (Lemon Squeezy, fora do Brasil). */
   const dinheiro = (centavos, moeda) => (moeda === "USD"
     ? (Number(centavos) / 100).toLocaleString("en-US", { style: "currency", currency: "USD" }) : reais(centavos));
 
@@ -251,7 +251,7 @@
     for (const c of document.querySelectorAll(".como-site")) c.hidden = false;
   }
 
-  /** Fora do Brasil (Paddle): os precos da pagina inicial ([data-preco], [data-equiv]) viram os em dolar da API. */
+  /** Fora do Brasil (Lemon Squeezy): os precos da pagina inicial ([data-preco], [data-equiv]) viram os em dolar da API. */
   function precosEmDolar(precos) {
     let fmt;
     try { fmt = new Intl.NumberFormat(IDIOMA, { style: "currency", currency: "USD" }); } catch (e) { fmt = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }); }
@@ -269,7 +269,7 @@
       cur.textContent = simbolo;
       cur.nextSibling.textContent = num;
       const per = s.querySelector(".per");
-      if (per && !per.dataset.imposto) {                  // a Paddle soma o imposto do pais de quem compra
+      if (per && !per.dataset.imposto) {                  // a Lemon Squeezy soma o imposto do pais de quem compra
         per.dataset.imposto = "1";
         per.textContent += t(" + impostos");
       }
@@ -281,7 +281,7 @@
       s.textContent = s.dataset.equiv === "floating" ? t("sai por {valor} por vaga, por mês", { valor }) : t("sai por {valor} por mês", { valor });
     }
     for (const s of document.querySelectorAll(".pag-mp")) s.hidden = true;
-    for (const s of document.querySelectorAll(".pag-paddle")) s.hidden = false;
+    for (const s of document.querySelectorAll(".pag-fora")) s.hidden = false;
   }
 
   /** Copia o texto; sem permissao, deixa a chave a mostra para copiar a mao. */
@@ -294,11 +294,11 @@
     }
   }
 
-  /** Endereco do pagamento: so do Mercado Pago ou da Paddle (o servidor manda, mas o script confere antes de ir). */
+  /** Endereco do pagamento: so do Mercado Pago ou da Lemon Squeezy (o servidor manda, mas o script confere antes de ir). */
   function doPagamento(endereco, moeda) {
     try {
       const u = new URL(endereco);
-      const host = moeda === "USD" ? /(^|\.)paddle\.(io|com)$/ : /(^|\.)mercadopago\.com(\.br)?$/;
+      const host = moeda === "USD" ? /(^|\.)lemonsqueezy\.com$/ : /(^|\.)mercadopago\.com(\.br)?$/;
       return u.protocol === "https:" && host.test(u.hostname);
     } catch (e) {
       return false;
@@ -312,16 +312,16 @@
     // o Mercado Pago pode juntar o external_reference); a volta da compra traz external_reference e payment_id
     // os ids sao hexadecimais; o Mercado Pago gruda "?preapproval_id=..." no fim do endereco de volta da assinatura
     const soId = (v) => ((v || "").match(/^[0-9a-f]{1,40}/) || [""])[0];
-    // volta do checkout da Paddle (comprar?paddle=1): o id da assinatura ficou guardado antes de ir
+    // volta do checkout de fora do Brasil (comprar?externo=1): o id da assinatura ficou guardado antes de ir
     // (depois fica no endereco, para recarregar a pagina, e sai da lembranca: a proxima compra guarda a dela)
-    const daPaddle = q.has("paddle");
-    const assinaturaId = soId(q.get("assinatura") || (daPaddle ? lembrar(PADDLE) : ""));
-    if (daPaddle) guardar(PADDLE, null);
+    const deFora = q.has("externo");
+    const assinaturaId = soId(q.get("assinatura") || (deFora ? lembrar(EXTERNO) : ""));
+    if (deFora) guardar(EXTERNO, null);
     const compraId = assinaturaId ? "" : soId(q.get("external_reference") || q.get("compra"));
     const pagamento = (q.get("payment_id") || q.get("collection_id") || q.get("pagamento") || "").replace(/\D/g, "").slice(0, 20);
     if (assinaturaId) {
       const limpa = new URLSearchParams({ assinatura: assinaturaId });
-      if (daPaddle) limpa.set("paddle", "1");
+      if (deFora) limpa.set("externo", "1");
       history.replaceState(null, "", `${location.pathname}?${limpa}`);
     }
     if (compraId) {
@@ -342,9 +342,9 @@
         entrar.setAttribute("href", SITE);
       }
       if (compraId) return voltaDoPagamento(compraId, pagamento);
-      // voltou da Paddle em outra aba (sem o id guardado): a licenca aparece na conta
-      if (daPaddle && !assinaturaId) return location.replace(SITE);
-      if (assinaturaId) return voltaDaAssinatura(assinaturaId, daPaddle ? "Paddle" : "Mercado Pago");
+      // voltou do checkout de fora em outra aba (sem o id guardado): a licenca aparece na conta
+      if (deFora && !assinaturaId) return location.replace(SITE);
+      if (assinaturaId) return voltaDaAssinatura(assinaturaId, deFora ? e.provedor || "Lemon Squeezy" : "Mercado Pago");
       if (!e.pagamento) {
         if (!e.compra) {
           bloco("compra-off-titulo").textContent = t("Compra temporariamente indisponível fora do Brasil");
@@ -367,13 +367,14 @@
     };
     form.hidden = false;
     const moeda = e.moeda === "USD" ? "USD" : "BRL";
-    // fora do Brasil (Paddle): so renovacao automatica, no cartao ou PayPal
+    // fora do Brasil (Lemon Squeezy): so renovacao automatica, no cartao ou PayPal
+    const nome = e.provedor || "Lemon Squeezy";
     if (moeda === "USD") {
       marcar("automatica", "1");
       document.getElementById("compra-renovacao").hidden = true;
-      document.getElementById("compra-sub").textContent = t("Pague pela Paddle, em dólar. A chave sai na hora: por e-mail e na sua conta.");
+      document.getElementById("compra-sub").textContent = t("Pague pela {nome}, em dólar. A chave sai na hora: por e-mail e na sua conta.", { nome });
       const fino = form.querySelector(".compra-fine");
-      if (fino) fino.textContent = t("Você vai para o checkout da Paddle e volta para cá depois de pagar. A renovação é automática; cancele quando quiser na sua conta. Não guardamos dados de cartão.");
+      if (fino) fino.textContent = t("Você vai para o checkout da {nome} e volta para cá depois de pagar. A renovação é automática; cancele quando quiser na sua conta. Não guardamos dados de cartão.", { nome });
     }
     let renovar = null;
     const licId = q.get("licenca");
@@ -410,13 +411,13 @@
       }
       document.getElementById("compra-total").textContent = ok ? dinheiro(e.precos[tipo][escolhido("plano")] * n, moeda) : "—";
       const mensal = escolhido("plano") === "monthly";
-      // na Paddle o imposto do pais de quem compra vem por cima (o checkout mostra o valor final)
+      // fora do Brasil o imposto do pais de quem compra vem por cima (o checkout mostra o valor final)
       document.getElementById("compra-periodo").textContent = moeda === "USD"
         ? (mensal ? t("+ impostos do seu país, por mês, até você cancelar") : t("+ impostos do seu país, por ano, até você cancelar"))
         : escolhido("automatica") === "1"
         ? (mensal ? t("por mês, no cartão, até você cancelar") : t("por ano, no cartão, até você cancelar"))
         : (mensal ? t("por 1 mês") : t("por 1 ano"));
-      botao.textContent = moeda === "USD" ? t("Assinar com a Paddle")
+      botao.textContent = moeda === "USD" ? t("Assinar com a {nome}", { nome })
         : escolhido("automatica") === "1" ? t("Assinar com Mercado Pago") : t("Pagar com Mercado Pago");
     }
     form.addEventListener("input", atualizar);
@@ -430,7 +431,7 @@
       const r = await enviar("/comprar", { tipo: escolhido("tipo"), plano: escolhido("plano"), vagas: String(n),
         licenca: renovar ? renovar.id : "", automatica: escolhido("automatica") === "1" ? "1" : "0" });
       if (r.ok && doPagamento(r.url, moeda)) {
-        if (r.assinatura) guardar(PADDLE, r.assinatura);
+        if (r.assinatura) guardar(EXTERNO, r.assinatura);
         return location.assign(r.url);
       }
       botao.disabled = false;
@@ -499,7 +500,7 @@
     conferir();
   }
 
-  /** Volta do Mercado Pago (ou da Paddle) depois de assinar: espera a primeira cobranca e mostra a chave. */
+  /** Volta do Mercado Pago (ou do checkout de fora do Brasil) depois de assinar: espera a primeira cobranca e mostra a chave. */
   function voltaDaAssinatura(assinaturaId, provedor) {
     const caixa = document.getElementById("compra-volta");
     const titulo = document.getElementById("compra-titulo");
@@ -534,20 +535,20 @@
           el("p", {}, cancelarNaConta), irParaConta());
       }
       if (r.situacao === "pendente" || r.situacao === "ativa") {
-        const paddle = provedor === "Paddle";
-        titulo.textContent = r.situacao === "ativa" ? t("Cartão autorizado") : (paddle ? t("Aguardando a Paddle") : t("Aguardando o Mercado Pago"));
+        const fora = provedor !== "Mercado Pago";
+        titulo.textContent = r.situacao === "ativa" ? t("Cartão autorizado") : (fora ? t("Aguardando a {nome}", { nome: provedor }) : t("Aguardando o Mercado Pago"));
         const fim = ++tentativas >= 24;
         if (!fim) setTimeout(conferir, 5000);
         return mostrar(t("Aguardando a primeira cobrança"),
-          el("p", {}, paddle ? t("Assim que a Paddle aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.")
+          el("p", {}, fora ? t("Assim que a {nome} aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.", { nome: provedor })
             : t("Assim que o Mercado Pago aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.")),
           fim ? el("p", {}, t("Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.")) : null);
       }
       titulo.textContent = t("Assinatura não ativada");
       return mostrar(r.situacao === "pausada"
-          ? (provedor === "Paddle" ? t("A assinatura está pausada na Paddle") : t("A assinatura está pausada no Mercado Pago"))
+          ? (provedor !== "Mercado Pago" ? t("A assinatura está pausada na {nome}", { nome: provedor }) : t("A assinatura está pausada no Mercado Pago"))
           : t("A renovação automática foi cancelada"),
-        el("p", {}, provedor === "Paddle" ? t("Nada foi cobrado por esta página. Se quiser, tente de novo.")
+        el("p", {}, provedor !== "Mercado Pago" ? t("Nada foi cobrado por esta página. Se quiser, tente de novo.")
           : t("Nada foi cobrado por esta página. Se quiser, tente de novo ou pague uma vez com Pix.")),
         el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, t("Tentar de novo"))));
     }
@@ -637,7 +638,7 @@
     if (l.assinatura) {
       const a = l.assinatura;
       auto = el("p", { class: "aba-auto" }, a.situacao === "pausada"
-        ? (a.provedor === "Paddle" ? t("Renovação automática pausada na Paddle") : t("Renovação automática pausada no Mercado Pago"))
+        ? (a.provedor && a.provedor !== "Mercado Pago" ? t("Renovação automática pausada na {nome}", { nome: a.provedor }) : t("Renovação automática pausada no Mercado Pago"))
         : (a.proxima ? t("Renovação automática ligada · próxima cobrança em {data}", { data: dataBr(a.proxima) }) : t("Renovação automática ligada")));
       const cancelar = el("button", { type: "button", onclick: () => perguntarMotivo(a.id, () => {
         auto.textContent = (l.vence ? t("Renovação automática cancelada: a licença vale até {data} e não haverá mais cobranças.", { data: dataBr(l.vence) })
