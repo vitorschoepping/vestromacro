@@ -66,7 +66,7 @@
           <li>o nome do computador;</li>
           <li>a versão do aplicativo.</li>
         </ul>
-        <p>O servidor guarda esses dados para lembrar que aquele computador já usou o teste (assim ele não recomeça ao reinstalar) e para saber quando o teste termina. No teste, o nome do usuário do Windows não é enviado, e o endereço IP é usado só na hora, para limitar abusos, sem ser guardado.</p>
+        <p>O servidor guarda esses dados para lembrar que aquele computador já usou o teste (assim ele não recomeça ao reinstalar) e para saber quando o teste termina. No teste, o nome do usuário do Windows não é enviado, e o endereço IP é usado só na hora, para limitar abusos, sem ser guardado. Para o mesmo fim, fica por um dia só um código da rede de onde veio o pedido, que não permite descobrir o IP.</p>
 
         <h2>Atualizações</h2>
         <p>Para saber se existe versão nova, o Vestro envia ao servidor só a versão instalada. Nada disso é guardado. A versão nova é baixada do GitHub, onde fica o arquivo de download.</p>
@@ -74,7 +74,7 @@
         <h2>A conta no site</h2>
         <p>Se você criar uma conta no site, guardamos o nome, o e-mail e o telefone de contato que você informar, e a senha só de um jeito embaralhado (um hash), que não permite descobrir a senha. A conta só é criada depois que você abre o link que mandamos para o seu e-mail. Você vê e muda esses dados na própria conta. As licenças que você adiciona ficam ligadas à conta, para você ver a situação delas.</p>
         <p>Usamos o e-mail só para mandar os links da conta (confirmar o e-mail, criar uma senha nova), pelo serviço de envio de e-mails Resend, que recebe o seu endereço e o texto da mensagem para entregar. Cada link funciona uma vez e vence (em 48 horas; o de senha nova, em 1 hora).</p>
-        <p>Ao entrar, o site guarda no seu navegador um único cookie, necessário para manter você na conta. Ele não rastreia nada e vale por 30 dias, ou até você sair. Junto da sessão fica o endereço IP de onde você entrou, por segurança. Errar a senha muitas vezes trava as tentativas por alguns minutos; o IP usado nesse limite não é guardado.</p>
+        <p>Ao entrar, o site guarda no seu navegador um único cookie, necessário para manter você na conta. Ele não rastreia nada e vale por 30 dias, ou até você sair. Junto da sessão fica o endereço IP de onde você entrou, por segurança. Errar a senha muitas vezes trava as tentativas por alguns minutos; o IP usado nesse limite não é guardado. Os pedidos que mandam e-mail (cadastro, “esqueci minha senha” e troca de e-mail) também contam, por um dia, num código da rede de onde vieram, que não permite descobrir o IP.</p>
         <p>Para saber se a compra pelo site está disponível, o site usa o país de onde vem o acesso (informado pela Cloudflare a partir do IP), sem guardar.</p>
 
         <h2>Quando você compra</h2>

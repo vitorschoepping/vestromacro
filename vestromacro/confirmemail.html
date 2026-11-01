@@ -41,10 +41,14 @@
     <div class="conta-cartao">
       <header>
         <h1>Confirmar e-mail</h1>
-        <p>Falta só um clique para confirmar seu e-mail.</p>
+        <p>Falta só digitar a senha da sua conta para confirmar seu e-mail.</p>
       </header>
       <form id="form-confirmar" method="post" novalidate>
         <p class="conta-msg" role="alert" aria-live="assertive"></p>
+        <div class="campo">
+          <label for="confirmar-senha">Senha</label>
+          <input id="confirmar-senha" name="senha" type="password" autocomplete="current-password" required>
+        </div>
         <button class="btn btn-primary" type="submit">Confirmar e-mail</button>
       </form>
       <noscript><p class="conta-msg">Para confirmar o e-mail, o navegador precisa estar com o JavaScript ligado.</p></noscript>
