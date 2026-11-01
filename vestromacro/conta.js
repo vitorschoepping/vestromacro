@@ -251,6 +251,39 @@
     for (const c of document.querySelectorAll(".como-site")) c.hidden = false;
   }
 
+  /** Fora do Brasil (Paddle): os precos da pagina inicial ([data-preco], [data-equiv]) viram os em dolar da API. */
+  function precosEmDolar(precos) {
+    let fmt;
+    try { fmt = new Intl.NumberFormat(IDIOMA, { style: "currency", currency: "USD" }); } catch (e) { fmt = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }); }
+    const partes = (centavos) => {
+      const p = fmt.formatToParts(Number(centavos) / 100);
+      return { cur: p.filter((x) => x.type === "currency").map((x) => x.value).join(""),
+        num: p.filter((x) => x.type !== "currency" && x.type !== "literal").map((x) => x.value).join("") };
+    };
+    for (const s of document.querySelectorAll("[data-preco]")) {
+      const [tipo, plano] = s.dataset.preco.split(" ");
+      const v = precos && precos[tipo] && precos[tipo][plano];
+      const cur = s.querySelector(".cur");
+      if (!v || !cur || !cur.nextSibling) continue;
+      const { cur: simbolo, num } = partes(v);
+      cur.textContent = simbolo;
+      cur.nextSibling.textContent = num;
+      const per = s.querySelector(".per");
+      if (per && !per.dataset.imposto) {                  // a Paddle soma o imposto do pais de quem compra
+        per.dataset.imposto = "1";
+        per.textContent += t(" + impostos");
+      }
+    }
+    for (const s of document.querySelectorAll("[data-equiv]")) {
+      const v = precos && precos[s.dataset.equiv] && precos[s.dataset.equiv].annual;
+      if (!v) continue;
+      const valor = fmt.format(Math.round(v / 12) / 100);
+      s.textContent = s.dataset.equiv === "floating" ? t("sai por {valor} por vaga, por mês", { valor }) : t("sai por {valor} por mês", { valor });
+    }
+    for (const s of document.querySelectorAll(".pag-mp")) s.hidden = true;
+    for (const s of document.querySelectorAll(".pag-paddle")) s.hidden = false;
+  }
+
   /** Copia o texto; sem permissao, deixa a chave a mostra para copiar a mao. */
   async function copiar(texto, botao) {
     try {
@@ -373,11 +406,14 @@
       const ok = Number.isInteger(n) && n >= 1 && n <= 50;
       for (const p of form.querySelectorAll(".compra-preco")) {
         const v = e.precos[tipo][p.dataset.plano];
-        p.textContent = `${dinheiro(v, moeda)}${NOME_PLANO[p.dataset.plano]}${tipo === "floating" ? t(" por vaga") : ""}`;
+        p.textContent = `${dinheiro(v, moeda)}${NOME_PLANO[p.dataset.plano]}${tipo === "floating" ? t(" por vaga") : ""}${moeda === "USD" ? t(" + impostos") : ""}`;
       }
       document.getElementById("compra-total").textContent = ok ? dinheiro(e.precos[tipo][escolhido("plano")] * n, moeda) : "—";
       const mensal = escolhido("plano") === "monthly";
-      document.getElementById("compra-periodo").textContent = escolhido("automatica") === "1"
+      // na Paddle o imposto do pais de quem compra vem por cima (o checkout mostra o valor final)
+      document.getElementById("compra-periodo").textContent = moeda === "USD"
+        ? (mensal ? t("+ impostos do seu país, por mês, até você cancelar") : t("+ impostos do seu país, por ano, até você cancelar"))
+        : escolhido("automatica") === "1"
         ? (mensal ? t("por mês, no cartão, até você cancelar") : t("por ano, no cartão, até você cancelar"))
         : (mensal ? t("por 1 mês") : t("por 1 ano"));
       botao.textContent = moeda === "USD" ? t("Assinar com a Paddle")
@@ -750,6 +786,7 @@
       if (!e.compra) compraIndisponivel();
       pagamentoLigado = Boolean(e.pagamento);
       if (pagamentoLigado) compraPeloSite();
+      if (e.moeda === "USD" && e.precos) precosEmDolar(e.precos);
       if (e.conta) {
         const aviso = lembrar(AVISO);
         guardar(AVISO, null);

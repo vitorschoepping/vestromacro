@@ -12,7 +12,7 @@
   <link rel="icon" href="/vestromacro/img/icone.png">
   <link rel="stylesheet" href="/vestromacro/styles.css?v=5c33ae78">
   <!-- scripts do proprio site: conta (Entrar, aba lateral, compra fora do Brasil) e o fundo animado -->
-  <script src="/vestromacro/conta.js?v=c71af8c4" defer></script>
+  <script src="/vestromacro/conta.js?v=b44c850e" defer></script>
   <script src="/vestromacro/malha.js?v=1c452156" defer></script>
   <link rel="canonical" href="https://www.vestroautomation.com/pt-br/vestromacro/">
   <link rel="alternate" hreflang="pt-BR" href="https://www.vestroautomation.com/pt-br/vestromacro/">
@@ -184,7 +184,8 @@
           </div>
         </header>
 
-        <!-- Fora do Brasil o conta.js troca os botoes .comprar e o bloco .buy por "temporariamente indisponivel".
+        <!-- Fora do Brasil o conta.js troca os botoes .comprar e o bloco .buy por "temporariamente indisponivel" ou,
+             com a Paddle ligada, os precos ([data-preco], [data-equiv]) pelos em dolar que a API manda.
              Com a compra pelo site ligada (Mercado Pago), os botoes levam a pagina comprar e o "Como comprar" troca de lista. -->
         <!-- Sem script: escolher Fixa ou Flutuante troca precos e botoes so pelo CSS (:has). Fixa vem marcada. -->
         <div class="g12 pricing">
@@ -213,8 +214,8 @@
               <h3>Mensal</h3>
               <p class="plan-kind swap"><span class="is-fixa">Licença fixa</span><span class="is-flut">Licença flutuante</span></p>
               <p class="price swap" aria-live="polite">
-                <span class="is-fixa"><span class="cur">R$</span>39,90<span class="per">/mês</span></span>
-                <span class="is-flut"><span class="cur">R$</span>129,90<span class="per">/mês por vaga</span></span>
+                <span class="is-fixa" data-preco="fixed monthly"><span class="cur">R$</span>39,90<span class="per">/mês</span></span>
+                <span class="is-flut" data-preco="floating monthly"><span class="cur">R$</span>129,90<span class="per">/mês por vaga</span></span>
               </p>
               <p>Para começar sem compromisso. Renova mês a mês.</p>
               <a class="btn btn-ghost is-fixa comprar" data-tipo="fixed" data-plano="monthly" href="mailto:contato@vestroautomation.com?subject=Vestro%20Macro&amp;body=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Mensal%2C%20R%24%2039%2C90%20por%20m%C3%AAs.">Quero a fixa mensal</a>
@@ -225,10 +226,10 @@
               <h3>Anual</h3>
               <p class="plan-kind swap"><span class="is-fixa">Licença fixa</span><span class="is-flut">Licença flutuante</span></p>
               <p class="price swap" aria-live="polite">
-                <span class="is-fixa"><span class="cur">R$</span>399,00<span class="per">/ano</span></span>
-                <span class="is-flut"><span class="cur">R$</span>1.299,00<span class="per">/ano por vaga</span></span>
+                <span class="is-fixa" data-preco="fixed annual"><span class="cur">R$</span>399,00<span class="per">/ano</span></span>
+                <span class="is-flut" data-preco="floating annual"><span class="cur">R$</span>1.299,00<span class="per">/ano por vaga</span></span>
               </p>
-              <p class="equiv swap"><span class="is-fixa">sai por R$ 33,25 por mês</span><span class="is-flut">sai por R$ 108,25 por vaga, por mês</span></p>
+              <p class="equiv swap"><span class="is-fixa" data-equiv="fixed">sai por R$ 33,25 por mês</span><span class="is-flut" data-equiv="floating">sai por R$ 108,25 por vaga, por mês</span></p>
               <p>12 meses de uso pelo preço de 10, para quem já usa no dia a dia.</p>
               <a class="btn btn-primary is-fixa comprar" data-tipo="fixed" data-plano="annual" href="mailto:contato@vestroautomation.com?subject=Vestro%20Macro&amp;body=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Fixa%20%281%20computador%29%2C%20plano%20Anual%2C%20R%24%20399%2C00%20por%20ano.">Quero a fixa anual</a>
               <a class="btn btn-primary is-flut comprar" data-tipo="floating" data-plano="annual" href="mailto:contato@vestroautomation.com?subject=Vestro%20Macro&amp;body=Ol%C3%A1%21%20Quero%20comprar%20o%20Vestro%20Macro%3A%20licen%C3%A7a%20Flutuante%2C%20plano%20Anual%2C%20R%24%201.299%2C00%20por%20vaga%20por%20ano.%20Vagas%20que%20preciso%3A%20">Quero a flutuante anual</a>
@@ -245,7 +246,7 @@
             <p class="fine como-email">Em breve: compra direto pelo site, com a chave liberada na hora.</p>
             <ol class="como-site" hidden>
               <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5v-2M4.6 6.6 3.2 5.2M4.5 11h-2M13.4 6.6l1.4-1.4"/><path d="M9 9l11 4-4.6 1.6L13.8 19z"/></svg></span>Escolha fixa ou flutuante e clique no botão do plano. Entre na sua conta do site (ou crie uma em um minuto).</li>
-              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 10h18M7 15h4"/></svg></span>Pague pelo Mercado Pago: no cartão, com renovação automática (cancele quando quiser na sua conta), ou uma vez, com Pix ou cartão.</li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 10h18M7 15h4"/></svg></span><span class="pag-mp">Pague pelo Mercado Pago: no cartão, com renovação automática (cancele quando quiser na sua conta), ou uma vez, com Pix ou cartão.</span><span class="pag-paddle" hidden>Pague pela Paddle, em dólar, no cartão. A renovação é automática, e você cancela quando quiser na sua conta.</span></li>
               <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8m-3 3 2.5 2.5M14 9l2 2"/></svg></span>A chave <code>VSTR-…</code> sai na hora: na sua conta e no seu e-mail. Ative no Vestro: tudo o que você montou no teste continua lá.</li>
             </ol>
             <p class="aviso-regiao" role="status"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.3"/></svg>Fora do Brasil, a compra está temporariamente indisponível. Você já pode baixar e usar grátis por 30 dias, com tudo liberado.</p>
