@@ -1,7 +1,7 @@
 /* conta.js — area do cliente no site: botao Entrar, aba lateral de quem entrou e compra fora do Brasil;
    paginas de entrar, criar conta, confirmar o e-mail e criar senha nova (links do e-mail);
    compra pelo Mercado Pago (pagina comprar: escolher o plano e a renovacao, pagar e a volta do pagamento, com a
-   chave) e, fora do Brasil, pela Lemon Squeezy (em dolar, sempre com renovacao automatica); na aba, cancelar a renovacao
+   chave) e, fora do Brasil, pela Dodo Payments (em dolar, sempre com renovacao automatica); na aba, cancelar a renovacao
    automatica.
 
    O unico script do site (CSP script-src 'self'). Chama a API do Worker no mesmo endereco,
@@ -236,7 +236,7 @@
 
   // ------------------------------------------------------------ compra pelo site (Mercado Pago)
   const reais = (centavos) => (Number(centavos) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  /** Valor na moeda da compra: reais (Mercado Pago) ou dolares (Lemon Squeezy, fora do Brasil). */
+  /** Valor na moeda da compra: reais (Mercado Pago) ou dolares (Dodo Payments, fora do Brasil). */
   const dinheiro = (centavos, moeda) => (moeda === "USD"
     ? (Number(centavos) / 100).toLocaleString("en-US", { style: "currency", currency: "USD" }) : reais(centavos));
 
@@ -251,7 +251,7 @@
     for (const c of document.querySelectorAll(".como-site")) c.hidden = false;
   }
 
-  /** Fora do Brasil (Lemon Squeezy): os precos da pagina inicial ([data-preco], [data-equiv]) viram os em dolar da API. */
+  /** Fora do Brasil (Dodo Payments): os precos da pagina inicial ([data-preco], [data-equiv]) viram os em dolar da API. */
   function precosEmDolar(precos) {
     let fmt;
     try { fmt = new Intl.NumberFormat(IDIOMA, { style: "currency", currency: "USD" }); } catch (e) { fmt = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }); }
@@ -269,7 +269,7 @@
       cur.textContent = simbolo;
       cur.nextSibling.textContent = num;
       const per = s.querySelector(".per");
-      if (per && !per.dataset.imposto) {                  // a Lemon Squeezy soma o imposto do pais de quem compra
+      if (per && !per.dataset.imposto) {                  // a Dodo Payments soma o imposto do pais de quem compra
         per.dataset.imposto = "1";
         per.textContent += t(" + impostos");
       }
@@ -294,11 +294,11 @@
     }
   }
 
-  /** Endereco do pagamento: so do Mercado Pago ou da Lemon Squeezy (o servidor manda, mas o script confere antes de ir). */
+  /** Endereco do pagamento: so do Mercado Pago ou da Dodo Payments (o servidor manda, mas o script confere antes de ir). */
   function doPagamento(endereco, moeda) {
     try {
       const u = new URL(endereco);
-      const host = moeda === "USD" ? /(^|\.)lemonsqueezy\.com$/ : /(^|\.)mercadopago\.com(\.br)?$/;
+      const host = moeda === "USD" ? /(^|\.)dodopayments\.com$/ : /(^|\.)mercadopago\.com(\.br)?$/;
       return u.protocol === "https:" && host.test(u.hostname);
     } catch (e) {
       return false;
@@ -344,7 +344,7 @@
       if (compraId) return voltaDoPagamento(compraId, pagamento);
       // voltou do checkout de fora em outra aba (sem o id guardado): a licenca aparece na conta
       if (deFora && !assinaturaId) return location.replace(SITE);
-      if (assinaturaId) return voltaDaAssinatura(assinaturaId, deFora ? e.provedor || "Lemon Squeezy" : "Mercado Pago");
+      if (assinaturaId) return voltaDaAssinatura(assinaturaId, deFora ? e.provedor || "Dodo Payments" : "Mercado Pago");
       if (!e.pagamento) {
         if (!e.compra) {
           bloco("compra-off-titulo").textContent = t("Compra temporariamente indisponível fora do Brasil");
@@ -367,8 +367,8 @@
     };
     form.hidden = false;
     const moeda = e.moeda === "USD" ? "USD" : "BRL";
-    // fora do Brasil (Lemon Squeezy): so renovacao automatica, no cartao ou PayPal
-    const nome = e.provedor || "Lemon Squeezy";
+    // fora do Brasil (Dodo Payments): so renovacao automatica, no cartao ou PayPal
+    const nome = e.provedor || "Dodo Payments";
     if (moeda === "USD") {
       marcar("automatica", "1");
       document.getElementById("compra-renovacao").hidden = true;
@@ -448,7 +448,7 @@
     titulo.textContent = t("Conferindo o pagamento…");
     sub.textContent = "";
     let tentativas = 0;
-    const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes);
+    const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes.filter(Boolean));  // null viraria o texto "null"
     const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, t("Ir para minha conta")));
     async function conferir() {
       const r = await enviar("/compra", { compra: compraId, pagamento });
@@ -508,7 +508,7 @@
     caixa.hidden = false;
     titulo.textContent = t("Conferindo a assinatura…");
     let tentativas = 0;
-    const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes);
+    const mostrar = (h, ...partes) => caixa.replaceChildren(el("h2", {}, h), ...partes.filter(Boolean));  // null viraria o texto "null"
     const irParaConta = () => el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: SITE }, t("Ir para minha conta")));
     const proxima = (r) => (r.proxima ? " " + t("A próxima cobrança é em {data}.", { data: dataBr(r.proxima) }) : "");
     const cancelarNaConta = t("Para cancelar a renovação automática, use “Cancelar renovação automática” na sua conta.");

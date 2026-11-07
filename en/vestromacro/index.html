@@ -12,7 +12,7 @@
   <link rel="icon" href="/vestromacro/img/icone.png">
   <link rel="stylesheet" href="/vestromacro/styles.css?v=5c33ae78">
   <!-- scripts do proprio site: conta (Entrar, aba lateral, compra fora do Brasil) e o fundo animado -->
-  <script src="/vestromacro/conta.js?v=8d5e49a1" defer></script>
+  <script src="/vestromacro/conta.js?v=fd85acc0" defer></script>
   <script src="/vestromacro/malha.js?v=1c452156" defer></script>
   <link rel="canonical" href="https://www.vestroautomation.com/en/vestromacro/">
   <link rel="alternate" hreflang="pt-BR" href="https://www.vestroautomation.com/pt-br/vestromacro/">
@@ -186,7 +186,7 @@
         </header>
 
         <!-- Fora do Brasil o conta.js troca os botoes .comprar e o bloco .buy por "temporariamente indisponivel" ou,
-             com a Lemon Squeezy ligada, os precos ([data-preco], [data-equiv]) pelos em dolar que a API manda.
+             com a Dodo Payments ligada, os precos ([data-preco], [data-equiv]) pelos em dolar que a API manda.
              Com a compra pelo site ligada (Mercado Pago), os botoes levam a pagina comprar e o "Como comprar" troca de lista. -->
         <!-- Sem script: escolher Fixa ou Flutuante troca precos e botoes so pelo CSS (:has). Fixa vem marcada. -->
         <div class="g12 pricing">
@@ -247,7 +247,7 @@
             <p class="fine como-email">Coming soon: buy straight from the site, with the key released right away.</p>
             <ol class="como-site" hidden>
               <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5v-2M4.6 6.6 3.2 5.2M4.5 11h-2M13.4 6.6l1.4-1.4"/><path d="M9 9l11 4-4.6 1.6L13.8 19z"/></svg></span>Choose fixed or floating and click the plan's button. Sign in to your account on the site (or create one in a minute).</li>
-              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 10h18M7 15h4"/></svg></span><span class="pag-mp">Pay with Mercado Pago: by card, with automatic renewal (cancel anytime in your account), or once, with Pix or card.</span><span class="pag-fora" hidden>Pay through Lemon Squeezy, in dollars, by card. Renewal is automatic, and you can cancel any time in your account.</span></li>
+              <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 10h18M7 15h4"/></svg></span><span class="pag-mp">Pay with Mercado Pago: by card, with automatic renewal (cancel anytime in your account), or once, with Pix or card.</span><span class="pag-fora" hidden>Pay through Dodo Payments, in dollars, by card. Renewal is automatic, and you can cancel any time in your account.</span></li>
               <li><span class="buy-ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8m-3 3 2.5 2.5M14 9l2 2"/></svg></span>The key <code>VSTR-…</code> is released right away: in your account and in your email. Activate it in Vestro: everything you built during the trial is still there.</li>
             </ol>
             <p class="aviso-regiao" role="status"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.3"/></svg>Outside Brazil, buying is temporarily unavailable. You can already download it and use it free for 30 days, with everything unlocked.</p>
