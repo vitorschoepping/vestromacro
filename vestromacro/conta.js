@@ -344,7 +344,7 @@
       if (compraId) return voltaDoPagamento(compraId, pagamento);
       // voltou do checkout de fora em outra aba (sem o id guardado): a licenca aparece na conta
       if (deFora && !assinaturaId) return location.replace(SITE);
-      if (assinaturaId) return voltaDaAssinatura(assinaturaId, deFora ? e.provedor || "Dodo Payments" : "Mercado Pago");
+      if (assinaturaId) return voltaDaAssinatura(assinaturaId, deFora);
       if (!e.pagamento) {
         if (!e.compra) {
           bloco("compra-off-titulo").textContent = t("Compra temporariamente indisponível fora do Brasil");
@@ -367,14 +367,13 @@
     };
     form.hidden = false;
     const moeda = e.moeda === "USD" ? "USD" : "BRL";
-    // fora do Brasil (Dodo Payments): so renovacao automatica, no cartao ou PayPal
-    const nome = e.provedor || "Dodo Payments";
+    // fora do Brasil (Dodo Payments): so renovacao automatica, no cartao ou PayPal; o nome dela nao aparece (pedido do Vitor, 2026-11-20)
     if (moeda === "USD") {
       marcar("automatica", "1");
       document.getElementById("compra-renovacao").hidden = true;
-      document.getElementById("compra-sub").textContent = t("Pague pela {nome}, em dólar. A chave sai na hora: por e-mail e na sua conta.", { nome });
+      document.getElementById("compra-sub").textContent = t("Pague em dólar. A chave sai na hora: por e-mail e na sua conta.");
       const fino = form.querySelector(".compra-fine");
-      if (fino) fino.textContent = t("Você vai para o checkout da {nome} e volta para cá depois de pagar. A renovação é automática; cancele quando quiser na sua conta. Não guardamos dados de cartão.", { nome });
+      if (fino) fino.textContent = t("Você vai para a página de pagamento e volta para cá depois de pagar. A renovação é automática; cancele quando quiser na sua conta. Não guardamos dados de cartão.");
     }
     let renovar = null;
     const licId = q.get("licenca");
@@ -417,7 +416,7 @@
         : escolhido("automatica") === "1"
         ? (mensal ? t("por mês, no cartão, até você cancelar") : t("por ano, no cartão, até você cancelar"))
         : (mensal ? t("por 1 mês") : t("por 1 ano"));
-      botao.textContent = moeda === "USD" ? t("Assinar com a {nome}", { nome })
+      botao.textContent = moeda === "USD" ? t("Assinar")
         : escolhido("automatica") === "1" ? t("Assinar com Mercado Pago") : t("Pagar com Mercado Pago");
     }
     form.addEventListener("input", atualizar);
@@ -501,7 +500,7 @@
   }
 
   /** Volta do Mercado Pago (ou do checkout de fora do Brasil) depois de assinar: espera a primeira cobranca e mostra a chave. */
-  function voltaDaAssinatura(assinaturaId, provedor) {
+  function voltaDaAssinatura(assinaturaId, fora) {
     const caixa = document.getElementById("compra-volta");
     const titulo = document.getElementById("compra-titulo");
     document.getElementById("compra-sub").textContent = "";
@@ -535,20 +534,19 @@
           el("p", {}, cancelarNaConta), irParaConta());
       }
       if (r.situacao === "pendente" || r.situacao === "ativa") {
-        const fora = provedor !== "Mercado Pago";
-        titulo.textContent = r.situacao === "ativa" ? t("Cartão autorizado") : (fora ? t("Aguardando a {nome}", { nome: provedor }) : t("Aguardando o Mercado Pago"));
+        titulo.textContent = r.situacao === "ativa" ? t("Cartão autorizado") : (fora ? t("Aguardando o pagamento") : t("Aguardando o Mercado Pago"));
         const fim = ++tentativas >= 24;
         if (!fim) setTimeout(conferir, 5000);
         return mostrar(t("Aguardando a primeira cobrança"),
-          el("p", {}, fora ? t("Assim que a {nome} aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.", { nome: provedor })
+          el("p", {}, fora ? t("Assim que o pagamento for aprovado, a chave aparece aqui, na sua conta e no seu e-mail.")
             : t("Assim que o Mercado Pago aprovar a cobrança, a chave aparece aqui, na sua conta e no seu e-mail.")),
           fim ? el("p", {}, t("Pode fechar esta página: quando aprovar, mandamos a chave por e-mail.")) : null);
       }
       titulo.textContent = t("Assinatura não ativada");
       return mostrar(r.situacao === "pausada"
-          ? (provedor !== "Mercado Pago" ? t("A assinatura está pausada na {nome}", { nome: provedor }) : t("A assinatura está pausada no Mercado Pago"))
+          ? (fora ? t("A assinatura está pausada") : t("A assinatura está pausada no Mercado Pago"))
           : t("A renovação automática foi cancelada"),
-        el("p", {}, provedor !== "Mercado Pago" ? t("Nada foi cobrado por esta página. Se quiser, tente de novo.")
+        el("p", {}, fora ? t("Nada foi cobrado por esta página. Se quiser, tente de novo.")
           : t("Nada foi cobrado por esta página. Se quiser, tente de novo ou pague uma vez com Pix.")),
         el("p", { class: "compra-acoes" }, el("a", { class: "btn btn-primary", href: "comprar" }, t("Tentar de novo"))));
     }
@@ -638,7 +636,7 @@
     if (l.assinatura) {
       const a = l.assinatura;
       auto = el("p", { class: "aba-auto" }, a.situacao === "pausada"
-        ? (a.provedor && a.provedor !== "Mercado Pago" ? t("Renovação automática pausada na {nome}", { nome: a.provedor }) : t("Renovação automática pausada no Mercado Pago"))
+        ? (a.provedor && a.provedor !== "Mercado Pago" ? t("Renovação automática pausada") : t("Renovação automática pausada no Mercado Pago"))
         : (a.proxima ? t("Renovação automática ligada · próxima cobrança em {data}", { data: dataBr(a.proxima) }) : t("Renovação automática ligada")));
       const cancelar = el("button", { type: "button", onclick: () => perguntarMotivo(a.id, () => {
         auto.textContent = (l.vence ? t("Renovação automática cancelada: a licença vale até {data} e não haverá mais cobranças.", { data: dataBr(l.vence) })
