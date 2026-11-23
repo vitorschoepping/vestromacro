@@ -286,6 +286,9 @@ details p { color: var(--ink-2); padding: 0 44px 26px 0; max-width: 68ch; }
 .conta-cartao form .btn { width: 100%; margin-top: 6px; }
 .conta-msg { font-size: .9rem; color: var(--erro); padding: 10px 12px; border: 1px solid #5a2a2a; border-radius: 8px; background: #1c1012; }
 .conta-msg:empty { display: none; }
+/* captcha da Cloudflare (Turnstile), montado pelo conta.js antes do botao; o quadro dela tem 65px de altura */
+.conta-captcha { min-height: 65px; }
+.conta-captcha[hidden] { display: none; }
 .conta-alt { text-align: center; color: var(--ink-2); font-size: .94rem; }
 
 /* ------------------------------------------------ pagina de texto (privacidade) */

@@ -4,7 +4,11 @@
    chave) e, fora do Brasil, pela Dodo Payments (em dolar, sempre com renovacao automatica); na aba, cancelar a renovacao
    automatica.
 
-   O unico script do site (CSP script-src 'self'). Chama a API do Worker no mesmo endereco,
+   Nas paginas de entrar, criar conta e esqueci a senha, o captcha da Cloudflare (Turnstile): o script dela vem na
+   propria pagina (a CSP dessas tres aceita challenges.cloudflare.com) e este monta o widget quando a API manda a
+   chave do site (criar e esqueci: sempre; entrar: depois de uma senha errada).
+
+   O script do site (CSP script-src 'self'). Chama a API do Worker no mesmo endereco,
    /vestromacro/api/conta (server/cloudflare/src/conta.js); a sessao fica num cookie HttpOnly que
    o script nem enxerga. Tudo o que vem da API entra na pagina como texto (textContent), nunca como HTML. */
 (() => {
@@ -115,9 +119,86 @@
     caixa.setAttribute("role", tipo === "erro" ? "alert" : "status");
   }
 
+  // ------------------------------------------------------------ captcha (Cloudflare Turnstile)
+  /** Widget do Turnstile no formulario, antes do botao. acao: a mesma que o Worker confere (entrar, criar, esqueci).
+   *  sempre: mostra assim que souber a chave do site; senao, so quando a API pedir (resposta com captcha: true). */
+  function captchaDo(form, acao, { sempre }) {
+    let chave = null, id = null, pedido = false, semScript = false;
+    const AVISO_SEM_SCRIPT = t("Não deu para carregar a verificação contra robôs. Desligue o bloqueador de anúncios ou tente em outra rede, e recarregue a página.");
+    const caixa = el("div", { class: "conta-captcha", hidden: true });
+    const botao = form.querySelector("button[type=submit]");
+    (botao ? botao.parentNode : form).insertBefore(caixa, botao);
+
+    /** O script da Cloudflare (tag da pagina) carregou? Espera por ele. Bloqueado (bloqueador de anuncios, rede
+     *  que filtra) ou fora do ar: avisa, em vez de deixar a pessoa tentando sem saber por que. */
+    function quandoPronto(fn) {
+      if (window.turnstile) return fn();
+      const tag = document.getElementById("turnstile-api");
+      if (!tag) return falhou();
+      tag.addEventListener("load", () => {
+        if (!window.turnstile) return falhou();
+        if (semScript) {                     // chegou depois do tempo: volta ao normal (e tira so o aviso dele)
+          semScript = false;
+          caixa.hidden = false;
+          const msg = form.querySelector(".conta-msg");
+          if (msg && msg.textContent === AVISO_SEM_SCRIPT) mensagem(msg, "", "erro");
+        }
+        fn();
+      }, { once: true });
+      tag.addEventListener("error", falhou, { once: true });
+      // o erro pode ter acontecido antes de este script rodar (o da Cloudflare e async): sem ele depois de 10 s, avisa
+      setTimeout(() => { if (!window.turnstile) falhou(); }, 10000);
+    }
+
+    function falhou() {
+      semScript = true;
+      caixa.hidden = true;
+      mensagem(form.querySelector(".conta-msg"), AVISO_SEM_SCRIPT, "erro");
+    }
+
+    function mostrar() {
+      if (!chave || id !== null) return;
+      caixa.hidden = false;
+      quandoPronto(() => {
+        if (id !== null) return;
+        id = window.turnstile.render(caixa, {
+          sitekey: chave, action: acao, theme: "dark", size: "flexible",
+          language: IDIOMA.toLowerCase(), "response-field": false,
+        });
+      });
+    }
+
+    return {
+      /** O estado da API chegou: liga o captcha se o Worker tiver a chave. */
+      chave(c) {
+        chave = typeof c === "string" && c ? c : null;
+        if (chave && (sempre || pedido)) mostrar();
+      },
+      /** Mensagem de quando falta o captcha. */
+      aviso(c) {
+        if (semScript) return falhou();
+        mensagem(c, t("Confirme que você não é um robô e tente de novo."), "erro");
+      },
+      /** Resposta do widget para mandar junto ("" se nao tiver). */
+      token: () => (id !== null && window.turnstile ? window.turnstile.getResponse(id) || "" : ""),
+      /** Falta resolver o captcha (o que esta na tela, ou o que nao carregou)? */
+      falta() { return semScript || (id !== null && !this.token()); },
+      /** Depois de cada envio: a resposta vale uma vez so (recomeca). A API pode pedir o captcha: a resposta traz a
+       *  chave do site em captcha (assim funciona mesmo se o estado nao chegou). */
+      depois(r) {
+        if (id !== null && window.turnstile) window.turnstile.reset(id);
+        if (r && typeof r.captcha === "string" && r.captcha) {
+          if (!chave) chave = r.captcha;
+          pedido = true;
+          mostrar();
+        }
+      },
+    };
+  }
+
   /** Liga um formulario a uma acao da API. extra: campos que nao estao no formulario (ex.: o link).
-   *  depois(resposta) roda quando deu certo. */
-  function ligar(form, acao, { conferir, depois, extra }) {
+   *  depois(resposta) roda quando deu certo. captcha: o de captchaDo (manda a resposta junto). */
+  function ligar(form, acao, { conferir, depois, extra, captcha }) {
     const caixa = form.querySelector(".conta-msg") || form.insertBefore(el("p", { class: "conta-msg erro" }), form.firstChild);
     form.addEventListener("submit", async (ev) => {
       ev.preventDefault();
@@ -127,11 +208,16 @@
       delete dados.senha2;              // a repeticao da senha so e conferida aqui
       delete dados.nova2;
       Object.assign(dados, extra || {});
+      if (captcha) {
+        if (captcha.falta()) return captcha.aviso(caixa);
+        dados.captcha = captcha.token();
+      }
       const botao = form.querySelector("button[type=submit]");
       if (botao) botao.disabled = true;
       mensagem(caixa, "", "erro");
       const r = await enviar(acao, dados);
       if (botao) botao.disabled = false;
+      if (captcha) captcha.depois(r);
       if (!r.ok) return mensagem(caixa, r.mensagem || t("Não deu certo. Tente de novo."), "erro");
       await depois(r, form);
     });
@@ -164,7 +250,10 @@
   function paginaDeEntrada(form, acao) {
     const aviso = lembrar(AVISO);           // ex.: veio do link de troca de e-mail sem ter entrado neste navegador
     if (aviso && acao === "/entrar") mensagem(form.querySelector(".conta-msg"), aviso, "ok");
+    // criar conta: captcha sempre; entrar: so depois de uma senha errada (a API avisa)
+    const captcha = captchaDo(form, acao.slice(1), { sempre: acao === "/criar" });
     ligar(form, acao, {
+      captcha,
       conferir: (d) => (d.senha2 !== undefined && d.senha !== d.senha2 ? t("As duas senhas não são iguais.") : ""),
       depois: (r) => {
         if (acao === "/entrar") return voltarAoSite("");
@@ -174,11 +263,17 @@
       },
     });
     // ja entrou? volta para o site
-    estado().then((e) => { if (e.conta) location.replace(destino()); }).catch(() => {});
+    estado().then((e) => {
+      if (e.conta) return location.replace(destino());
+      captcha.chave(e.captcha);
+    }).catch(() => {});
   }
 
   function paginaEsqueci(form) {
+    const captcha = captchaDo(form, "esqueci", { sempre: true });
+    estado().then((e) => captcha.chave(e.captcha)).catch(() => {});
     ligar(form, "/esqueci", {
+      captcha,
       depois: (r) => mostrarEnviado(form, t("Confira seu e-mail"),
         t("Se {email} tiver conta no site, mandamos para ele um link para criar uma senha nova.", { email: r.email }),
         t("O link vale por 1 hora. Não chegou? Confira a caixa de spam ou tente de novo daqui a alguns minutos.")),

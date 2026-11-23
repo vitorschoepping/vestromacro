@@ -10,6 +10,27 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Cross-Origin-Opener-Policy: same-origin
 
+# Paginas com o captcha da Cloudflare (Turnstile, pedido do Vitor em 2026-11-22): a CSP de cima sai (o "!") e entra
+# a mesma, aceitando o script e o quadro do challenges.cloudflare.com. So estas tres; o resto do site continua so 'self'.
+# O Referrer-Policy vira strict-origin: o quadro do Turnstile confere o endereco do site (vai so o dominio, nunca a pagina).
+/:idioma/vestromacro/login
+  ! Content-Security-Policy
+  ! Referrer-Policy
+  Referrer-Policy: strict-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/:idioma/vestromacro/createaccount
+  ! Content-Security-Policy
+  ! Referrer-Policy
+  Referrer-Policy: strict-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/:idioma/vestromacro/forgotpassword
+  ! Content-Security-Policy
+  ! Referrer-Policy
+  Referrer-Policy: strict-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
 # O endereco *.pages.dev do projeto (e o das versoes de teste) mostra o mesmo site:
 # fica fora do Google, para a busca levar so ao vestroautomation.com.
 https://:project.pages.dev/*
